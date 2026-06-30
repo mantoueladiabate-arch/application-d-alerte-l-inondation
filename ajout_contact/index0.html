@@ -1,0 +1,92 @@
+  <!DOCTYPE html>
+    <html lang="fr" dir="ltr">
+      <head>
+        <meta charset="utf-8"/>
+          <title> PREVENTION ET GESTION DU RISQUE D'INONDATION </title>
+          <!--lierle fichier css à html-->
+          <link rel="stylesheet" href="style.css"/>
+			<meta http-equiv="Content-Type" content="text/html">
+			<link href="bootstrap4/css/bootstrap.min.css" rel="stylesheet">
+      </head>
+
+      <body>
+      	<!-- Navigation -->
+            <nav>
+              <ul class="navbar navbar-light bg-light nav nav-pills nav-justified">
+              	<img src="images/logo_igt.jpg" width="100" border="0" alt="Logo" title="Logo officiel">
+                 <li class="nav-item"><a class="nav-link" href="index_acceuil1.html">Acceuil1</a></li>
+                  <li class="nav-item"><a class="nav-link" href="index_acceuil.html">Acceuil</a></li>
+                 <li class="nav-item"><a class="nav-link" href="index_evenement.html">Evenements</a></li>
+                 <li class="nav-item"><a class="nav-link" href="index_Contacter.html">Contacter</a></li>
+                 <li class="nav-item"><a class="nav-link" href="index_graphiques.html">Graphique</a></li>
+                 <li class="nav-item"><a class="nav-link" href="index_apropos.html">A propos</a></li>
+			  <form class="form-inline">
+				<input class="form-control mr-sm-2" type="recherche" placeholder="recherche">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Recherche</button>
+			  </form>
+              </ul>
+			</nav>
+			<!--image de fond-->	
+			<body background="images/eau.jpeg">
+        <div class="row">
+          <div class="col-md-6">
+			  <div id="img">
+				<img class="img-fluid" src="images/IMG-20191013-WA0012.jpg" title="inondation dans la commune de Cocody">
+			  </div>
+          </div>
+		<div class="col-md-6">       
+			<!--Creer un formulaire-->
+			<!--post indique la facon dont les données seront envoyées, action est l'adresse de la page quiva recuperer les données et les enregistrer-->
+			<form method="post" action="test-traitement.php" enctype="multipart/form-data">
+				 <div id="formulaire">  
+				  <p>Aider nous à rendre nos donnée plus precis.<br/> Fournissez-nous des données sur votre commune/quartier</p>  
+
+				<div class="form-group">
+					<label for="prenoms">Nom *</label>
+					<input type="text" class="form-control" name="nom" id="nom" placeholder="Entrez vos nom">
+				</div>
+  
+				<div class="form-group mt-3">
+					<label for="prenoms">Prénoms *</label>
+					<input type="text" class="form-control" name="prenoms" id="prenoms" placeholder="Entrez vos prenoms">
+				</div>
+				<div class="form-group mt-3">
+					<label form="sexe">Homme</label>
+					<input type="radio" name="sexe" id="homme"/>
+					<label form="sexe">Femme</label>
+					<input type="radio" name="sexe" id="femme" placeholder="Entrez votre nom"/>
+				</div>
+			    <div class="form-group mt-3">
+					<label form="email">Adresse Email</label>
+					<input type="email" class="form-control" name="email" id="email" placeholder="Entrez votre Email"/>
+				</div>
+				<div class="form-group mt-3">
+					<label form="contact">Numéro de téléphone</label>
+					<input type="tel" class="form-control" name="contact" id="contact" placeholder="Entrez votre contact"/>
+				</div>
+				<div class="form-group mt-3">
+					<label form="origine">Commune/quartier</label>
+					<input type="text" class="form-control" name="origine" id="origine" placeholder="Commune/quartier"/>
+				</div>
+				<div class="form-group mt-3">
+					<label form="commentaire">Commentaire</label>
+					<textarea class="form-control" name="commentaire" id="commentaire" rows="3"></textarea>
+				</div>
+				<div class="form-group mt-3">
+					<input type="file" class= "form-control-file" id="choisir_des_fichiers">
+					<p class="text"> Types de fichiers autorisés: .xls .doc .docx .pdf .odt txt .jpg .png</p>
+				</div>
+				<div>
+					<!--Creer un bouton pour envoyer les fichiers-->
+					<input type="submit"  name="submit" value="Envoyer" id="bouton_envoie" class="form-control"  style="width:auto;"/>
+				</div>
+				</div>
+				</div>
+			</form>
+		</div>
+
+		 <!--lier à html au bootrap et app de javascript-->
+		 <script src="bootstrap4/js/bootstrap.bundle.min.js"></script>
+       <script src="appjavascript.js"></script>
+      </body>
+    </html>
