@@ -51,7 +51,10 @@ if (isset($_POST['traiter_id'])) {
         'Effondrement' => "Risque d'effondrement signalé dans la zone {$prep}{$zone}.",
     ];
     $intro = $introMap[$inc['risques']] ?? "Incident dans la zone {$prep}{$zone}.";
-    $smsMessage = "ALERTE INONDATION\n{$intro}\nÉvite les routes inondées. Mets-toi en sécurité.\nÉcoute les consignes des autorités.";
+    $smsMessage = html_entity_decode(
+        "ALERTE INONDATION\n{$intro}\nÉvite les routes inondées. Mets-toi en sécurité.\nÉcoute les consignes des autorités.",
+        ENT_QUOTES | ENT_HTML5, 'UTF-8'
+    );
 
     $traitResult = ['incident' => $inc, 'message' => $smsMessage, 'envois' => []];
 

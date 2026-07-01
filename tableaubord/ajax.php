@@ -337,8 +337,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['elemid'])) {
         switch ($elemeid) {
             case 'update_risk_status':
                 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-                $recommandation = filter_input(INPUT_POST, 'recommandation', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $new_statut = filter_input(INPUT_POST, 'new_statut', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $recommandation = filter_input(INPUT_POST, 'recommandation', FILTER_DEFAULT);
+                $new_statut     = filter_input(INPUT_POST, 'new_statut',     FILTER_DEFAULT);
 
                 if ($id === false || !$new_statut) {
                     http_response_code(400);
