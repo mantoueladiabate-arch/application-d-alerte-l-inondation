@@ -9,7 +9,7 @@ error_reporting(E_ALL);
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres'); // On se connecte à la base de donnée
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084'); // On se connecte à la base de donnée
       $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } 
     // S'il existe un problème de connection, on obtient le message d'erreur

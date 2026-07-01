@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../config.php';
 // connection à la base données
   function connect() {
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
     } 
     // S'il existe un problème de connection, on obtient le message d'erreur
     catch(PDOException $ex) {

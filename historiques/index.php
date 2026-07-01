@@ -1,279 +1,205 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title> Historique des incidents </title>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Historique des alertes</title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="../dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap.min.css">
 
-    <style>
-      /*enlever le style des elements par defaut*/
-      *{
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
+  <style>
+    .media-thumbnail { max-width: 80px; max-height: 80px; }
+  </style>
+</head>
 
-      .txt{
-        /*si jamais le texte depasse pas de retour à la ligne*/
-        white-space: nowrap;
-        /*police de l'ecriture*/
-        font-size: 30px;
-        /*animation du texte*/
-        animation: scroll 10s linear infinite;      
-      }
+<body class="skin-blue sidebar-mini">
+<div class="wrapper">
 
-        /*animation du texte*/
-      @keyframes scroll {
-        /* 0% */ from {
-        /*decalage du texte tout à gauche*/
-        transform: translateX(-100%);
-        margin-left:100%
-       }
-        100% {
-         transform: translateX(0%); 
-        }
-      }
+  <?php include __DIR__ . '/../includes/sidebar.php'; ?>
 
-  body { 
-       background-color: #f8f9fa;
-        }
-        .container {
-           margin-top: 30px; 
-        }
-        .card-header { 
-          background-color: #007bff; 
-          color: white; 
-        }
+  <div class="content-wrapper">
+    <section class="content-header">
+      <h1><i class="fa fa-history"></i> Historique des alertes</h1>
+    </section>
 
-        .table th, .table td {
-           vertical-align: middle;
-        }
-        .btn-action { 
-          margin-right: 5px; 
-        }
-        .detail-label { 
-          font-weight: bold; 
-        }
-        .media-container {
-           max-width: 100%; 
-           height: auto; 
-           display: block; 
-           margin-top: 15px; 
-           border: 1px solid #ddd; 
-        }
-        .media-thumbnail { 
-        max-width: 100px; max-height: 100px;
-        }
-
-        
-    </style>
-
-
-  </head>
-  <body class="skin-blue fixed" data-spy="scroll" data-target="#scrollspy">
-   
-  <div class="container">
-    <h1 class="text-center mb-4"> </h1>
-     <div class="d-flex justify-content-between mb-3">
-      <a href= "../index.php" class="btn btn-info">Acceuil</a>
-        <a href="../contact/index.php" class="btn btn-danger">Emmetre une nouvelle alerte</a>
-        <button id="reloadIncidentsBtn" class="btn btn-info">Recharger la liste</button>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            Historique des Alertes Signalées
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="incidentsTable" class="table table-bordered table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Date Événement</th>
-                            <th>Commune</th>
-                            <th>Quartier</th>
-                            <th>Risque</th>
-                            <th>Fichier</th>
-                            <th>Description</th>
-                            <th>Recommandation</th>
-                            <th>Détails</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Alertes signalées</h3>
+              <div class="box-tools pull-right">
+                <button id="reloadIncidentsBtn" class="btn btn-info btn-sm">
+                  <i class="fa fa-refresh"></i> Recharger
+                </button>
+                <a href="../contact/index.php" class="btn btn-danger btn-sm">
+                  <i class="fa fa-exclamation-triangle"></i> Émettre une alerte
+                </a>
+              </div>
             </div>
+            <div class="box-body table-responsive">
+              <table id="incidentsTable" class="table table-bordered table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date Événement</th>
+                    <th>Commune</th>
+                    <th>Quartier</th>
+                    <th>Risque</th>
+                    <th>Fichier</th>
+                    <th>Description</th>
+                    <th>Recommandation</th>
+                    <th>Détails</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
+    </section>
+  </div><!-- /.content-wrapper -->
 
-<div class="modal fade" id="incidentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="incidentDetailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+</div><!-- /.wrapper -->
+
+<!-- Modale détails incident -->
+<div class="modal fade" id="incidentDetailsModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="incidentDetailsModalLabel">Détails de l'Incident #<span id="modalIncidentId"></span></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Détails de l'incident #<span id="modalIncidentId"></span></h4>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col-md-6">
             <p><strong>Commune :</strong> <span id="modalCommune"></span></p>
             <p><strong>Quartier :</strong> <span id="modalQuartier"></span></p>
-            <p><strong>Type de Risques :</strong> <span id="modalRisques"></span></p>
-            <p><strong>Date de l'Événement :</strong> <span id="modalDate"></span></p>
-            <p><strong>Date de Signalement :</strong> <span id="modalDateSignalisation"></span></p>
-            <p><strong>Dernière Mise à Jour :</strong> <span id="modalLastUpdated"></span></p>
+            <p><strong>Type de risque :</strong> <span id="modalRisques"></span></p>
+            <p><strong>Date :</strong> <span id="modalDate"></span></p>
+            <p><strong>Localisation :</strong> <span id="modalLatLon"></span></p>
           </div>
           <div class="col-md-6">
-            <p><strong>Localisation (Latitude, Longitude) :</strong> <span id="modalLatLon"></span></p>
             <p><strong>Description :</strong> <span id="modalDescription"></span></p>
-            <p><strong>Recommandation / Actions :</strong> <span id="modalRecommandation"></span></p>
-            <p><strong>Fichier Joint :</strong></p>
+            <p><strong>Recommandation :</strong> <span id="modalRecommandation"></span></p>
+            <p><strong>Fichier joint :</strong></p>
             <div id="modalFichier"></div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
       </div>
     </div>
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+<script src="../bootstrap/js/bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap.min.js"></script>
+<script src="../dist/js/app.min.js"></script>
 
 <script>
 $(document).ready(function() {
-    // URL de votre API pour récupérer les incidents traités
-    const API_URL = 'http://localhost/plateforme_inondation/historiques/api_historiques.php'; // <<< À MODIFIER SI VOTRE API EST AILLEURS
-  const BASE_FILE_PATH = '/plateforme_inondation/contact/informations/';
+    var API_URL      = 'http://localhost/application-d-alerte-l-inondation/historiques/api_historiques.php';
+    var BASE_FILE    = '/application-d-alerte-l-inondation/contact/informations/';
 
-    // Initialisation de DataTables (sans données initiales)
     var table = $('#incidentsTable').DataTable({
-        "language": {
-        
-          
-            "url": "./i18n/French.json" // Chemin relatif vers votre fichier local
-        },
-         "columns": [
-            { "data": "id" },
-            { "data": "date" },
-            { "data": "commune" },
-            { "data": "quartier" },
-            { "data": "risques" },
-            { "data": "fichier", "orderable": false, "searchable": false, "render": function(data, type, row) {
-              if (!data) {
-                return 'Aucun';
-                }
-                 // CONSTRUIT LE CHEMIN COMPLET DU FICHIER ICI
-                  const fileExt = data.split('.').pop().toLowerCase();
-                // Affiche un texte ou une icône dans le tableau, sans afficher la miniature
-                if (['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov', 'webm'].includes(fileExt)) {
-                    return `✔️ Fichier joint`;
-                }
-                return 'Fichier';
-            }},
-            { "data": "description", "render": function(data, type, row) {
-                // Tronque la description pour l'affichage dans le tableau
-                return data.length > 50 ? data.substr(0, 50) + '...' : data;
-            }},
-            { "data": "recommandation", "render": function(data, type, row) {
-                return data ? (data.length > 50 ? data.substr(0, 50) + '...' : data) : 'Non renseigné';
-            }},
-            { "data": null, "defaultContent": '<button class="btn btn-info btn-sm view-details">Voir les détails</button>', "orderable": false, "searchable": false }
+        language: { url: './i18n/French.json' },
+        order: [[1, 'desc']],
+        columns: [
+            { data: 'id', width: '50px' },
+            { data: 'date',
+              render: function(data) {
+                if (!data) return '—';
+                return new Date(data).toLocaleDateString('fr-FR');
+              }
+            },
+            { data: 'commune' },
+            { data: 'quartier' },
+            { data: 'risques' },
+            { data: 'fichier', orderable: false, searchable: false,
+              render: function(data) {
+                if (!data) return '<span class="text-muted">Aucun</span>';
+                var ext = data.split('.').pop().toLowerCase();
+                return ['jpg','jpeg','png','gif','mp4','mov','webm'].indexOf(ext) >= 0
+                       ? '<i class="fa fa-paperclip"></i> Fichier'
+                       : '<i class="fa fa-file"></i> Fichier';
+              }
+            },
+            { data: 'description',
+              render: function(data) {
+                if (!data) return '<em class="text-muted">—</em>';
+                return data.length > 60 ? data.substr(0,60)+'…' : data;
+              }
+            },
+            { data: 'recommandation',
+              render: function(data) {
+                if (!data) return '<em class="text-muted">Non renseigné</em>';
+                return data.length > 60 ? data.substr(0,60)+'…' : data;
+              }
+            },
+            { data: null, defaultContent: '<button class="btn btn-info btn-xs view-details"><i class="fa fa-eye"></i> Détails</button>',
+              orderable: false, searchable: false }
         ]
     });
 
-    // Fonction pour charger les données de l'API
     function loadIncidents() {
         $.ajax({
-            url: API_URL,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    // Nettoie le tableau et ajoute les nouvelles données
-                   table.clear().rows.add(response.data).draw();
-              } else {
-                console.error('Erreur de l\'API:', response.message);
-                alert('Erreur lors du chargement des incidents : ' + response.message);
-              }
+            url: API_URL, method: 'GET', dataType: 'json',
+            success: function(r) {
+                if (r.success) {
+                    table.clear().rows.add(r.data).draw();
+                } else {
+                    console.error('Erreur API:', r.message);
+                }
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-              console.error('Erreur AJAX:', textStatus, errorThrown, jqXHR.responseText);
-              alert('Impossible de charger les données. Vérifiez l\'URL de l\'API et le serveur.');
-            }
+            error: function(x, s, e) { console.error('Erreur AJAX:', s, e); }
         });
     }
 
-    // Charge les incidents au chargement de la page
     loadIncidents();
 
-    // Gestion du clic sur le bouton "Voir les détails"
+    $('#reloadIncidentsBtn').on('click', function() { loadIncidents(); });
+
     $('#incidentsTable tbody').on('click', '.view-details', function() {
-       
-        var data = table.row($(this).parents('tr')).data();
-          
+        var d = table.row($(this).parents('tr')).data();
+        if (!d) return;
 
-        // Vérifiez que data n'est pas undefined ou null
-    if (!data) {
-        console.error("Erreur: Les données de la ligne sont introuvables.");
-        return; // Arrête l'exécution si pas de données
-    }
+        $('#modalIncidentId').text(d.id);
+        $('#modalCommune').text(d.commune || '—');
+        $('#modalQuartier').text(d.quartier || '—');
+        $('#modalRisques').text(d.risques || '—');
+        $('#modalDate').text(d.date ? new Date(d.date).toLocaleDateString('fr-FR') : '—');
+        $('#modalLatLon').text(d.latitude && d.longitude ? d.latitude + ', ' + d.longitude : 'N/A');
+        $('#modalDescription').text(d.description || '—');
+        $('#modalRecommandation').text(d.recommandation || 'Aucune recommandation.');
 
-          // Remplir la modale avec les données de l'incident
-        $('#modalIncidentId').text(data.id);
-          $('#modalCommune').text(data.commune);
-          $('#modalQuartier').text(data.quartier);
-          $('#modalRisques').text(data.risques);
-          $('#modalDate').text(new Date(data.date).toLocaleDateString('fr-FR'));
-          $('#modalDateSignalisation').text(new Date(data.date_signalisation).toLocaleString('fr-FR'));
-          $('#modalLastUpdated').text(new Date(data.last_updated).toLocaleString('fr-FR'));
-          $('#modalLatLon').text(`${data.latitude || 'N/A'}, ${data.longitude || 'N/A'}`);
-          $('#modalDescription').text(data.description);
-          $('#modalRecommandation').text(data.recommandation || 'Aucune recommandation.');
-
-        // Afficher le fichier joint dans la modale
-        const modalFichierDiv = $('#modalFichier');
-        modalFichierDiv.empty(); // Nettoyer le contenu précédent
-         if (data.fichier) {
-            const fullFilePath = BASE_FILE_PATH + data.fichier;
-            const fileExt = data.fichier.split('.').pop().toLowerCase();
-            // Logique pour afficher le fichier en fonction de son type
-            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
-              modalFichierDiv.append(`<img src="${fullFilePath}" class="img-fluid" alt="Fichier joint">`);
-            } else if (['mp4', 'mov', 'webm'].includes(fileExt)) {
-              modalFichierDiv.append(`<video src="${fullFilePath}" class="img-fluid" controls></video>`);
-            } else if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'].includes(fileExt)) {
-              modalFichierDiv.append(`<a href="${fullFilePath}" target="_blank" class="btn btn-primary mt-2">Ouvrir le document</a>`);
+        var $f = $('#modalFichier').empty();
+        if (d.fichier) {
+            var path = BASE_FILE + d.fichier;
+            var ext  = d.fichier.split('.').pop().toLowerCase();
+            if (['jpg','jpeg','png','gif'].indexOf(ext) >= 0) {
+                $f.append('<img src="'+path+'" class="img-responsive" alt="Fichier joint">');
+            } else if (['mp4','mov','webm'].indexOf(ext) >= 0) {
+                $f.append('<video src="'+path+'" class="img-responsive" controls></video>');
             } else {
-              modalFichierDiv.append(`<span>Fichier inconnu: <a href="${fullFilePath}" target="_blank">Télécharger</a></span>`);
+                $f.append('<a href="'+path+'" target="_blank" class="btn btn-primary btn-sm">Ouvrir le document</a>');
             }
-          } else {
-            modalFichierDiv.append('<span>Aucun fichier joint.</span>');
+        } else {
+            $f.append('<span class="text-muted">Aucun fichier joint.</span>');
         }
-        // Afficher la modale
+
         $('#incidentDetailsModal').modal('show');
-       
-    });
-     // Gestion du clic sur le bouton "Recharger"
-    $('#reloadIncidentsBtn').on('click', function() {
-        loadIncidents();
     });
 });
 </script>
-
 </body>
 </html>

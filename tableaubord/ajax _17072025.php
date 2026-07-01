@@ -7,7 +7,7 @@ function connect() {
 
     try{
          // On se connecte à MySQL
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084');
     // Définit le mode d'erreur de PDO sur les exceptions pour une gestion robuste des erreurs
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // Définit le mode de récupération par défaut sur les tableaux associatifs

@@ -482,7 +482,7 @@ poster un document
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres'); // On se connecte à la base de donnée
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084'); // On se connecte à la base de donnée
     } 
     // S'il existe un problème de connection, on obtient le message d'erreur
     catch(PDOException $ex) {
@@ -806,7 +806,7 @@ poster un document
 $host = 'localhost';
 $dbname = 'base_inondation';
 $user = 'postgres'; // Utilisateur PostgreSQL
-$password = 'postgres'; // Mot de passe PostgreSQL
+$password = '0151516084'; // Mot de passe PostgreSQL
 
 // Connexion PDO
 try {
@@ -1023,7 +1023,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['image'])) {
 $host = 'localhost';
 $dbname = 'base_inondation';
 $user = 'postgres'; // Utilisateur PostgreSQL
-$password = 'postgres'; // Mot de passe PostgreSQL
+$password = '0151516084'; // Mot de passe PostgreSQL
 
 // Connexion PDO
 try {
@@ -1093,7 +1093,7 @@ $photos = $stmt->fetchAll();
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres'); // On se connecte à la base de donnée
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084'); // On se connecte à la base de donnée
     } 
     // S'il existe un problème de connection, on obtient le message d'erreur
     catch(PDOException $ex) {

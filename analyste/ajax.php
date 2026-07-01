@@ -1,13 +1,51 @@
 <?php
-error_reporting(E_ALL); // Affiche toutes les erreurs, avertissements, etc.
-ini_set('display_errors', 1); // Force l'affichage à l'écran
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once __DIR__ . '/../config.php';
+
+function sendSmsAlert($telephone, $message) {
+    $telephone = preg_replace('/\s+/', '', $telephone);
+    if (!str_starts_with($telephone, '+')) {
+        if (str_starts_with($telephone, '00225')) {
+            $telephone = '+' . substr($telephone, 2);
+        } elseif (str_starts_with($telephone, '225')) {
+            $telephone = '+' . $telephone;
+        } else {
+            $telephone = '+225' . $telephone; // 0XXXXXXXXX → +2250XXXXXXXXX
+        }
+    }
+    $payload = json_encode([
+        'clientid'     => SMS_CLIENT_ID,
+        'clientsecret' => SMS_CLIENT_SECRET,
+        'telephone'    => $telephone,
+        'message'      => $message
+    ]);
+    $ch = curl_init('https://www.hsms.ci/api/envoi-sms/');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTPHEADER     => [
+            'Authorization: Bearer ' . SMS_TOKEN,
+            'Content-Type: application/json'
+        ]
+    ]);
+    $response = curl_exec($ch);
+    $code     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return ['code' => $code, 'body' => json_decode($response, true)];
+}
 
 function connect() {
     $conn = null;
 
     try{
         // On se connecte à MySQL
-        $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+        $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
         // Définit le mode d'erreur de PDO sur les exceptions pour une gestion robuste des erreurs
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // Définit le mode de récupération par défaut sur les tableaux associatifs
@@ -225,20 +263,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['elemid'])) {
                     exit();
                 }
 
-                $sql = 'SELECT
-                            id as id,
-                            risques,
-                            description,
-                            fichier,
-                            latitude,
-                            longitude,
-                            new_statut,
-                            date,
-                            quartier,
-                            commune, -- Ajout de la commune
-                            recommandation -- Ajout de la recommandation
-                        FROM informations
-                        WHERE id = :id';
+                $sql = 'SELECT id, risques, description, fichier, latitude, longitude,
+                               new_statut, date, quartier, recommandation, commune
+                        FROM informations WHERE id = :id';
 
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -246,9 +273,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['elemid'])) {
                 $risk_details = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($risk_details) {
+                    // Résoudre le nom de commune si c'est un ID numérique
+                    if (is_numeric($risk_details['commune'])) {
+                        $stmtC = $conn->prepare('SELECT commune FROM communes_abidjan WHERE id = :cid');
+                        $stmtC->execute([':cid' => (int)$risk_details['commune']]);
+                        $cRow = $stmtC->fetch(PDO::FETCH_ASSOC);
+                        if ($cRow) $risk_details['commune'] = $cRow['commune'];
+                    }
                     header('Content-Type: application/json');
                     ob_clean();
-                    echo json_encode(['success' => true, 'data' => $risk_details], JSON_NUMERIC_CHECK);
+                    echo json_encode(['success' => true, 'data' => $risk_details]);
                 } else {
                     http_response_code(404); // Not Found
                     header('Content-Type: application/json');
@@ -337,7 +371,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['elemid'])) {
                 $recommandation = filter_input(INPUT_POST, 'recommandation', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $new_statut = filter_input(INPUT_POST, 'new_statut', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-                if ($id === false || !$recommandation || !$new_statut) {
+                if ($id === false || !$new_statut) {
                     http_response_code(400);
                     header('Content-Type: application/json');
                     ob_clean();
@@ -355,9 +389,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['elemid'])) {
                 $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
                 if ($stmt->execute()) {
+                    // Envoi SMS si incident traité
+                    $smsSent = 0;
+                    if ($new_statut === 'traite') {
+                        $stmtInfo = $conn->prepare(
+                            'SELECT risques, quartier, commune FROM informations WHERE id = :id'
+                        );
+                        $stmtInfo->execute([':id' => $id]);
+                        $incident = $stmtInfo->fetch(PDO::FETCH_ASSOC);
+                        $commune_nom = $incident['commune'] ?? '';
+                        if ($incident && is_numeric($incident['commune'])) {
+                            $stmtC = $conn->prepare('SELECT commune FROM communes_abidjan WHERE id = :cid');
+                            $stmtC->execute([':cid' => (int)$incident['commune']]);
+                            $cRow = $stmtC->fetch(PDO::FETCH_ASSOC);
+                            if ($cRow) $commune_nom = $cRow['commune'];
+                        }
+
+                        $smsMessage = !empty($recommandation) ? $recommandation : 'ALERTE INONDATION';
+
+                        $smsLogs = [];
+                        $stmtContacts = $conn->query(
+                            "SELECT contact1 FROM contacts WHERE contact1 IS NOT NULL AND contact1 <> ''"
+                        );
+                        $contacts = $stmtContacts->fetchAll(PDO::FETCH_COLUMN);
+
+                        if (empty($contacts)) {
+                            $smsLogs[] = ['tel' => null, 'status' => 'Aucun contact trouvé en base'];
+                        }
+
+                        foreach ($contacts as $tel) {
+                            $result = sendSmsAlert($tel, $smsMessage);
+                            $smsLogs[] = [
+                                'tel'    => $tel,
+                                'http'   => $result['code'],
+                                'reponse'=> $result['body'],
+                                'message'=> substr($smsMessage, 0, 80)
+                            ];
+                            error_log('[SMS] tel=' . $tel . ' http=' . $result['code'] . ' body=' . json_encode($result['body']));
+                            if (!empty($result['body']['success'])) $smsSent++;
+                        }
+                    }
                     header('Content-Type: application/json');
                     ob_clean();
-                    echo json_encode(['success' => true, 'message' => 'new_Statut et recommandation mis à jour.']);
+                    echo json_encode([
+                        'success'      => true,
+                        'message'      => 'Statut mis à jour.',
+                        'sms_envoyes'  => $smsSent,
+                        'sms_logs'     => $smsLogs ?? []
+                    ]);
                 } else {
                     http_response_code(500);
                     header('Content-Type: application/json');

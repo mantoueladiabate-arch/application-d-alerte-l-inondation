@@ -1,13 +1,9 @@
 <?php
-// Connexion à la base de données PostgreSQL
-$host = 'localhost';
-$dbname = 'base_inondation';
-$user = 'postgres'; // Utilisateur PostgreSQL
-$password = 'postgres'; // Mot de passe PostgreSQL
+require_once __DIR__ . '/../config.php';
 
 // Connexion PDO
 try {
-    $conn = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION,
 );
 } catch (PDOException $e) {

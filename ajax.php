@@ -1,13 +1,14 @@
 <?php
 error_reporting(E_ALL); // Affiche toutes les erreurs, avertissements, etc.
 ini_set('display_errors', 1); // Force l'affichage à l'écran
+require_once __DIR__ . '/config.php';
 
 function connect() {
     $conn = null;
 
     try{
          // On se connecte à MySQL
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
     // Définit le mode d'erreur de PDO sur les exceptions pour une gestion robuste des erreurs
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // Définit le mode de récupération par défaut sur les tableaux associatifs

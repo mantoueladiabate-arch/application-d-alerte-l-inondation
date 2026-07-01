@@ -1,11 +1,12 @@
 <?php
+require_once __DIR__ . '/../config.php';
 
 // Si la fonction connect n'est pas dans un fichier séparé, vous pouvez la définir ici :
 function connect() {
     $conn = null;
     try {
         // Paramètres de connexion à la base de données PostgreSQL
-        $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation', 'postgres', 'postgres');
+        $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
         // Configure PDO pour qu'il lance des exceptions en cas d'erreur
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch(PDOException $ex) {

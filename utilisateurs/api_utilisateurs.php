@@ -9,17 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-// --- Configuration de la base de données PostgreSQL ---
-define('DB_HOST', 'localhost');
-define('DB_PORT', '5432');
-define('DB_NAME', 'base_inondation'); // Assurez-vous que c'est votre BDD utilisateurs
-define('DB_USER', 'postgres');
-define('DB_PASS', 'postgres'); // <<< REMPLACER CECI
+require_once __DIR__ . '/../config.php';
 
 // --- Connexion à la base de données avec PDO ---
 try {
-    $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME;
-    $pdo = new PDO($dsn, DB_USER, DB_PASS);
+    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {

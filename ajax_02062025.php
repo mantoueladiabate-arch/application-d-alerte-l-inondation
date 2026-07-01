@@ -7,7 +7,7 @@ function connect() {
 
     try{
          // On se connecte à MySQL
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084');
     } 
     // S'il existe un problème de connection, on obtient le message d'erreur
     catch(PDOException $ex) {

@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../config.php';
 // connection à la base données
   function connect() {
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
      // Ajout : pour une meilleure gestion des erreurs PDO
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       // echo "Connexion à la base de données réussie !";
@@ -44,8 +45,7 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)){
     exit();
 }
 //Définition de la requête SQL
-$sql_risques = "SELECT count(*) AS total_risque FROM informations WHERE new_statut = 'traite' AND risques IN ('Inondation', 'Erosion', 'Eboulement', 'Effondrement')";
-//$sql_risques = "SELECT count(*) AS total_risque FROM informations WHERE risques IN ('Inondation', 'Erosion', 'Eboulement', 'Effondrement')";
+$sql_risques = "SELECT count(*) AS total_risque FROM informations WHERE risques IN ('Inondation', 'Erosion', 'Eboulement', 'Effondrement')";
 //Executer la requete
 $result_risques = $conn->query($sql_risques);
 //Parcourir la table des résultats de la requête
@@ -53,8 +53,7 @@ $row_risques = $result_risques->fetch(PDO::FETCH_ASSOC);
 $total_risque = $row_risques['total_risque'];
 
 //Définition de la requête SQL
-$sql_Inondation = "SELECT count(*) AS total_inondation FROM informations WHERE new_statut = 'traite' AND risques = 'Inondation'";
-//  $sql_Inondation = "SELECT count(*) AS total_inondation FROM informations WHERE risques = 'Inondation'";
+$sql_Inondation = "SELECT count(*) AS total_inondation FROM informations WHERE risques = 'Inondation'";
   //Executer la requete
   $result_Inondation = $conn->query($sql_Inondation);
   //Parcourir la table des résultats de la requête
@@ -62,8 +61,7 @@ $sql_Inondation = "SELECT count(*) AS total_inondation FROM informations WHERE n
   $total_inondation = $row_Inondation['total_inondation'];
 
 //Définition de la requête SQL
-$sql_Erosion = "SELECT count(*) AS total_erosion FROM informations WHERE new_statut = 'traite' AND risques = 'Erosion'";
-//$sql_Erosion = "SELECT count(*) AS total_erosion FROM informations WHERE risques = 'Erosion'";
+$sql_Erosion = "SELECT count(*) AS total_erosion FROM informations WHERE risques = 'Erosion'";
 //Executer la requete
 $result_Erosion = $conn->query($sql_Erosion);
 //Parcourir la table des résultats de la requête
@@ -71,8 +69,7 @@ $row_Erosion = $result_Erosion->fetch(PDO::FETCH_ASSOC);
 $total_erosion = $row_Erosion['total_erosion'];
 
 //Définition de la requête SQL
-$sql_Eboulement = "SELECT count(*) AS total_eboulement FROM informations WHERE new_statut = 'traite' AND risques = 'Eboulement'";
-//$sql_Eboulement = "SELECT count(*) AS total_eboulement FROM informations WHERE risques = 'Eboulement'";
+$sql_Eboulement = "SELECT count(*) AS total_eboulement FROM informations WHERE risques = 'Eboulement'";
 //Executer la requete
 $result_Eboulement = $conn->query($sql_Eboulement);
 //Parcourir la table des résultats de la requête
@@ -80,8 +77,7 @@ $row_Eboulement = $result_Eboulement->fetch(PDO::FETCH_ASSOC);
 $total_eboulement = $row_Eboulement['total_eboulement'];
 
 //Définition de la requête SQL
-$sql_Effondrement = "SELECT count(*) AS total_effondrement FROM informations WHERE new_statut = 'traite' AND risques = 'Effondrement'";
-//$sql_Effondrement = "SELECT count(*) AS total_effondrement FROM informations WHERE risques = 'Effondrement'";
+$sql_Effondrement = "SELECT count(*) AS total_effondrement FROM informations WHERE risques = 'Effondrement'";
 //Executer la requete
 $result_Effondrement = $conn->query($sql_Effondrement);
 //Parcourir la table des résultats de la requête
@@ -123,20 +119,34 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
         padding: 10px 0;
       }
       /*contenant du navigateur du titre des type de risque*/
-      .box {
-    all: unset;
+.small-box {
+    transition: transform .2s ease, box-shadow .2s ease;
+    border-radius: 6px;
+    overflow: hidden;
 }
-        .box {
-  display: flex;
-      align-items: center;
-      justify-content: center;
+.small-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    cursor: pointer;
 }
-.box div {
-  width: 250px; /*largeur*/
-  height: 100px; /*largeur*/
+.small-box .inner {
+    padding: 12px 14px 10px;
+}
+.small-box h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px;
 }
 .small-box p {
-  font-size: 16px;
+    font-size: 13px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.small-box .icon {
+    font-size: 50px;
+    top: 10px;
 }
 .carte-container {
     display: flex; /* Utilise Flexbox pour organiser les enfants */
@@ -174,9 +184,9 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
         border-radius: 5px;
       }
     /*logo*/
-        img {
-        width: 100%; /*largueur de l'image*/
-        height:100px; /*hauteur de l'image*/
+        .modal img {
+        max-width: 100%;
+        height: auto;
       }
 /* Style pour le clignotement du popup */
 .blinking-red {
@@ -201,133 +211,65 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
 
 		</style>
   </head>
-<body >
- <div class="hold-transition skin-blue sidebar-mini">
+<body class="skin-blue sidebar-mini">
+<div class="wrapper">
 
-<a href="../index.php" class="logo">
-      <!-- Left side column. contains the logo and sidebar -->
-  <aside class="main-sidebar">
-        <!-- sidebar: style can be found in sidebar.less -->
-    <section class="sidebar">
-          <!-- Sidebar user panel -->         
-         <!-- search form -->
-          <form action="#"method="get" class="sidebar-form">
-            <div class="input-group">
-             <!--input type="text"name="q" class="form-control" placeholder="Search...">
-               <span class="input-group-btn">
-                 <button type="submit"name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
-               </span-->
-            </div>
-          </form>       
-          <!-- /.search form -->
-          <!-- sidebar menu: : style can be found in sidebar.less -->
-          <ul class="sidebar-menu">       
-            <li class="active treeview">
-              <a href="#"><li class="active"><a href="index.php"><i class="fa fa-circle-o"></i> Accueil </a></li></a>
-            </li>           
-            <li class="treeview">
-              <a href="tableaubord/index.php"> <i class="fa fa-table"></i> <span>Tableau de bord</span></i></a>
-            </li>      
-           
-           <li class="treeview">
-              <a href="#"><i class="fa fa-circle-o"></i><span> Commune </span><i class="fa fa-angle-left pull-right"></i></a>
-                <ul class="treeview-menu">
-                <?php echo $liste_commune; ?>
-                </ul> 
-            </li>
-              <li class="treeview">
-              <a href="statistique/index.php"> <i class="fa fa-table"></i> <span>Statistique</span></i></a>
-            </li>  
-            <li class="treeview">
-              <a href="contact/index.php"><i class="fa fa-phone"></i><span>Emmetre une alerte</span></a>
-            </li>
-            <li class="treeview">
-              <a href="analyste/index.php"><i class="fa fa-phone"></i><span>Analystes</span></a>
-            </li>
-            <li class="treeview">
-              <a href="historiques/index.php"><i class="fa fa-history"></i><span>Historiques</span></a>
-            </li>
-             <li class="treeview">
-              <a href="documentation/index.php"> <i class="fa fa-book"></i> <span>Galerie</span></i></a>
-            </li>
-              <li class="treeview">
-              <a href="ajout_contact/index.php"><i class="fa fa-phone"></i><span>Enregistrer un contact</span></a>
-            </li>
-             <li class="treeview">
-              <a href="utilisateurs/index.php"><i class="fa fa-user"></i><span>Gestion des utilisateurs</span></a>
-            </li>
-          </ul>
-    </section>
+<?php include __DIR__ . '/../includes/sidebar.php'; ?>
 
-        <!-- /.sidebar -->
-  </aside>
-    </a>
- </div>
-      <!-- Content Wrapper. Contains page content -->
+      <!-- Content Wrapper -->
       <div class="content-wrapper">
       <!-- Main content -->
+      <section class="content-header">
+        <h1><i class="fa fa-table"></i> Tableau de bord</h1>
+      </section>
       <section class="content">
-        <!-- Small boxes (Stat box) -->
-        <div class="box">
-          <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
+        <!-- Stat boxes -->
+        <div class="row">
+          <div class="col-xs-6 col-sm-4 col-md-2">
             <div class="small-box bg-red">
               <div class="inner">
-        <h3 id="nombre_risque"><?php echo $total_risque; ?></h3>
-                <p>Nombre de zones impactées</p>
+                <h3 id="nombre_risque"><?php echo $total_risque; ?></h3>
+                <p>Zones impactées</p>
               </div>
-               <!--<div class="icon">
-                <i class="ion ion-pie-graph"></i>
-              </div>-->
+              <div class="icon"><i class="fa fa-map-marker"></i></div>
             </div>
-          </div><!-- ./col -->
-          <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
+          </div>
+          <div class="col-xs-6 col-sm-4 col-md-2">
             <div class="small-box bg-blue">
               <div class="inner">
-               <h3 id="nombre_inondation"><?php echo $total_inondation; ?></h3>
-                <p>Nombre d'inondation</p>
+                <h3 id="nombre_inondation"><?php echo $total_inondation; ?></h3>
+                <p>Inondations</p>
               </div>
-             <!-- ./ <div class="icon">
-                <i class="ion ion-person"></i>
-              </div>-->
+              <div class="icon"><i class="fa fa-tint"></i></div>
             </div>
-          </div><!-- ./col -->
-          <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
+          </div>
+          <div class="col-xs-6 col-sm-4 col-md-2">
             <div class="small-box bg-yellow">
               <div class="inner">
-                <h3 id="nombre_erosion"><?php echo $total_erosion; ?><sup style="font-size: 20px"></sup></h3>
-                <p>Nombre d'érosion</p>
+                <h3 id="nombre_erosion"><?php echo $total_erosion; ?></h3>
+                <p>Érosions</p>
               </div>
-              <!-- ./<div class="icon">
-                <i class="ion ion-pie-graph"></i>
-              </div>-->
+              <div class="icon"><i class="fa fa-exclamation-triangle"></i></div>
             </div>
-          </div><!-- ./col -->
-          <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
+          </div>
+          <div class="col-xs-6 col-sm-4 col-md-2">
             <div class="small-box bg-aqua">
               <div class="inner">
-                <h3 id="nombre_eboulement"><?php echo $total_eboulement; ?><sup style="font-size: 20px"></sup></h3>
-                <p>Nombre d'éboulement</p>
+                <h3 id="nombre_eboulement"><?php echo $total_eboulement; ?></h3>
+                <p>Éboulements</p>
               </div>
-           <!-- ./ <div class="icon">
-                <i class="ion ion-pie-graph"></i>
-            </div> -->
+              <div class="icon"><i class="fa fa-warning"></i></div>
             </div>
-          </div><!-- ./col -->
-
-          <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
+          </div>
+          <div class="col-xs-6 col-sm-4 col-md-2">
             <div class="small-box bg-green">
-              <div class="inner" >
-                <h3 id="nombre_effondrement"><?php echo $total_effondrement; ?><sup style="font-size: 20px"></sup></h3>
-                <p>Nombre d'éffondrement</p>
+              <div class="inner">
+                <h3 id="nombre_effondrement"><?php echo $total_effondrement; ?></h3>
+                <p>Effondrements</p>
               </div>
-            
+              <div class="icon"><i class="fa fa-home"></i></div>
             </div>
-          </div><!-- ./col -->
+          </div>
         </div><!-- /.row -->
 
         <div class="carte-container">
@@ -383,7 +325,7 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
             <input type="hidden" id="modalRiskId" name="id">
             <div class="form-group">
               <label for="recommandation">Écrivez votre recommandation :</label>
-              <textarea class="form-control" id="recommandation" name="recommandation" rows="4" placeholder="Saisissez vos recommandations ici..."></textarea>
+              <textarea class="form-control" id="recommandationText" name="recommandation" rows="4" placeholder="Saisissez vos recommandations ici..."></textarea>
             </div>
             <div class="form-group">
               <label for="riskStatut">Statut de l'incident :</label>
@@ -505,7 +447,9 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
     
     // Fonction pour initialiser le diagramme circulaire
     function initPieChart() {
-        const ctx = document.getElementById('risksPieChart').getContext('2d');
+        var canvasPie = document.getElementById('risksPieChart');
+        if (!canvasPie) return;
+        const ctx = canvasPie.getContext('2d');
         risksPieChart = new Chart(ctx, {
             type: 'pie', // Type de diagramme
             data: {
@@ -656,12 +600,11 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
                             <p><strong>Quartier :</strong> ${risk.quartier || 'N/A'}</p>
                             <p><strong>Date :</strong> ${risk.date}</p>
                             <p><strong>Description :</strong> ${risk.description || 'Pas de description.'}</p>
-                            <p><strong>Recommandation actuelle :</strong> ${risk.recommandation || 'Aucune.'}</p>
                             <p><strong>Statut actuel :</strong> ${risk.new_statut || 'Non défini'}</p>
                         `;
                         // Afficher l'image/vidéo si disponible
                         if (risk.fichier) {
-                            const mediaBasePath = 'contact/informations/'; // Votre chemin vers les fichiers téléchargés
+                            const mediaBasePath = '../contact/informations/';
                             const mediaUrl = mediaBasePath + risk.fichier;
                             const fileExtension = risk.fichier.split('.').pop().toLowerCase();
                             if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
@@ -674,10 +617,21 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
                         } else {
                             content += `<p><strong>Média :</strong> Aucun média disponible.</p>`;
                         }
+                        var zone = (risk.quartier ? risk.quartier + ', ' : '') + (risk.commune || '');
+                        var prep = /^[AEIOUÀÂÉÈÊËÎÏÔÙÛÜaeiouyàâéèêëîïôùûü]/i.test(zone) ? "d'" : "de ";
+                        var introMap = {
+                            'Inondation':   "Forte pluie et risque d'inondation dans la zone " + prep + zone + ".",
+                            'Erosion':      "Risque d'érosion signalé dans la zone " + prep + zone + ".",
+                            'Eboulement':   "Risque d'éboulement signalé dans la zone " + prep + zone + ".",
+                            'Effondrement': "Risque d'effondrement signalé dans la zone " + prep + zone + "."
+                        };
+                        var intro = introMap[risk.risques] || "Incident signalé dans la zone " + prep + zone + ".";
+                        var recoValue = "ALERTE INONDATION\n" + intro + "\nÉvite les routes inondées. Mets-toi en sécurité.\nÉcoute les consignes des autorités.";
+
                         $('#riskInfoContent').html(content);
-                        $('#modalRiskId').val(riskId); // Définit l'ID dans le champ caché du formulaire
-                        $('#recommandationText').val(risk.recommandation || ''); // Pré-remplit la recommandation
-                        $('#riskStatut').val(risk.new_statut || ''); // Pré-remplit le statut
+                        $('#modalRiskId').val(riskId);
+                        $('#recommandationText').val(recoValue);
+                        $('#riskStatut').val(risk.new_statut || '');
                         $('#riskDetailsModal').modal('show'); // Affiche la modale
                     } else {
                         alert('Erreur: ' + (response.error || 'Impossible de récupérer les détails du risque.'));
@@ -697,7 +651,9 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
 
 // Fonction pour initialiser le graphique (à appeler au chargement de la page)
 function initChart() {
-    const ctx = document.getElementById('risksChart').getContext('2d');
+    var canvasChart = document.getElementById('risksChart');
+    if (!canvasChart) return;
+    const ctx = canvasChart.getContext('2d');
     risksChart = new Chart(ctx, {
         type: 'bar', 
         data: {
@@ -758,70 +714,39 @@ function updateChart(stats) {
 }
 
     // Gérer la soumission du formulaire de recommandation
-    $(document).ready(function() {
-        $('#recommendationForm').on('submit', function(e) {
-            e.preventDefault(); // Empêche la soumission normale du formulaire
-            var formData = {
-                id: $('#modalRiskId').val(),
-                recommandation: $('#recommandationText').val(), // Correction: ID de l'élément à 'recommandationText'
-                new_statut: $('#riskStatut').val()
-            };
-            var xhr = getXhr();
-            xhr.open('POST', 'ajax.php?elemid=update_risk_status', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    try {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            $('#recommendationMessage').html('<div class="alert alert-success">Recommandation enregistrée et statut mis à jour !</div>');
-                            var newStatut = formData.new_statut;
-                            var riskId = formData.id;
-                            var marker = riskMarkers[riskId];
-                            if (marker) {
-                                var riskType = marker.options.typeRisque;
-                                marker.setStyle({ fillColor: getMarkerColor(newStatut, riskType) });
-                                // Enlever la classe de clignotement si elle était présente
-                                if (marker.getElement() && marker.getElement().classList.contains('blinking-red')) {
-                                    marker.getElement().classList.remove('blinking-red');
-                                    // Aussi, retirer l'ID de notifiedRiskIds si le statut passe à "traité"
-                                    if (newStatut === 'traite') {
-                                        notifiedRiskIds.delete(riskId);
-                                    }
-                                } else if (newStatut === 'non_traite') {
-                                     // Si le statut est défini sur 'non_traite' via la modale, et qu'il ne clignotait pas
-                                     // alors ajouter la classe de clignotement (ex: un risque 'en_cours' devient 'non_traite')
-                                    if (marker.getElement() && !marker.getElement().classList.contains('blinking-red')) {
-                                        marker.getElement().classList.add('blinking-red');
-                                    }
-                                }
-                            }
-                            // Recharger les statistiques pour qu'elles se mettent à jour après la modification
-                            // Appel à une fonction de mise à jour des stats si elle existe, ou rafraîchissement complet
-                            // (ou laisser l'intervalle de rafraîchissement des stats s'en charger)
-                            // Exemple: updateCommuneStatistics(id_commune_actuelle);
-                            // Cacher la modale après un court délai
-                            setTimeout(() => {
-                                $('#riskDetailsModal').modal('hide');
-                                $('#recommendationMessage').empty(); // Nettoyer le message
-                            }, 1500);
-                        } else {
-                            $('#recommendationMessage').html('<div class="alert alert-danger">Erreur : ' + (response.error || 'Échec de l\'enregistrement. ') + '</div>');
+    $(document).on('submit', '#recommendationForm', function(e) {
+        e.preventDefault();
+        var riskId  = $('#modalRiskId').val();
+        var statut  = $('#riskStatut').val();
+        var reco    = $('#recommandationText').val();
+        $.ajax({
+            url: 'ajax.php?elemid=update_risk_status',
+            method: 'POST',
+            data: { id: riskId, new_statut: statut, recommandation: reco },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#recommendationMessage').html('<div class="alert alert-success">Statut mis à jour ! SMS envoyés : ' + (response.sms_envoyes || 0) + '</div>');
+                    var marker = riskMarkers[riskId];
+                    if (marker) {
+                        var riskType = marker.options.typeRisque;
+                        marker.setStyle({ fillColor: getMarkerColor(statut, riskType) });
+                        if (marker.getElement()) {
+                            marker.getElement().classList.remove('blinking-red');
                         }
-                    } catch (e) {
-                        console.error('Erreur de parsing JSON après soumission:', e);
-                        $('#recommendationMessage').html('<div class="alert alert-danger">Erreur de communication avec le serveur.</div>');
+                        if (statut === 'traite') notifiedRiskIds.delete(riskId);
                     }
-                } else if (xhr.readyState === 4) {
-                    console.error('Erreur HTTP lors de la soumission de la recommandation:', xhr.status, xhr.responseText);
-                    $('#recommendationMessage').html('<div class="alert alert-danger">Erreur serveur lors de l\'enregistrement.</div>');
+                    setTimeout(function() {
+                        $('#riskDetailsModal').modal('hide');
+                        $('#recommendationMessage').empty();
+                    }, 2000);
+                } else {
+                    $('#recommendationMessage').html('<div class="alert alert-danger">Erreur : ' + (response.error || 'Échec') + '</div>');
                 }
-            };
-            // Sérialisation des données du formulaire
-            var params = Object.keys(formData).map(function(key) {
-                return encodeURIComponent(key) + '=' + encodeURIComponent(formData[key]);
-            }).join('&');
-            xhr.send(params); // Envoi des données en tant que chaîne d'URL encodée
+            },
+            error: function(xhr) {
+                $('#recommendationMessage').html('<div class="alert alert-danger">Erreur serveur (HTTP ' + xhr.status + ') : ' + xhr.responseText + '</div>');
+            }
         });
     });
     // Fonction pour charger tous les risques au démarrage de la carte
@@ -1143,6 +1068,6 @@ function updateChart(stats) {
     <!-- AdminLTE App -->
     <script src="dist/js/app.min.js"></script>
 
- 
+</div><!-- /.wrapper -->
   </body>
 </html>

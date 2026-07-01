@@ -3,7 +3,7 @@
 function connect() {
     $conn = null;
     try {
-        $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation', 'postgres', 'postgres');
+        $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation', 'postgres', '0151516084');
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $ex) {
         error_log('Échec de la connexion à la base de données dans ajax.php: ' . $ex->getMessage());

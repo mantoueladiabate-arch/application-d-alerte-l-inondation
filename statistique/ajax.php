@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../config.php';
 // Fonction de connexion à la base de données (la même que dans index.php)
 function connect() {
     $conn = null;
     try {
-        $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation', 'postgres', 'postgres');
+        $conn = new PDO(DB_DSN, DB_USER, DB_PASS);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $ex) {
         error_log('Échec de la connexion à la base de données dans ajax.php: ' . $ex->getMessage());
@@ -103,7 +104,7 @@ switch ($_GET['elemid']) {
         } catch (PDOException $ex) {
             echo json_encode(['success' => false, 'error' => 'SQL Error: ' . $ex->getMessage()]);
         }
-        break;z
+        break;
 
     default:
         echo json_encode(['success' => false, 'error' => 'Invalid elemid.']);

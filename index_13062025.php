@@ -4,7 +4,7 @@
     $conn = null;
 
     try{
-      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','postgres');
+      $conn = new PDO('pgsql:host=localhost;port=5432;dbname=base_inondation','postgres','0151516084');
      // Ajout : pour une meilleure gestion des erreurs PDO
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       // echo "Connexion à la base de données réussie !";

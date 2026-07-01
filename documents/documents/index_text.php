@@ -3,7 +3,7 @@
 $host = 'localhost';
 $db = 'base_inondation';  // Remplacez par votre nom de base de données
 $user = 'postgres';   // Remplacez par votre nom d'utilisateur
-$pass = 'postgres';  // Remplacez par votre mot de passe
+$pass = '0151516084';  // Remplacez par votre mot de passe
 
 
 

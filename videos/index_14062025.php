@@ -3,7 +3,7 @@
 $host = 'localhost';
 $dbname = 'base_inondation';
 $user = 'postgres'; // Utilisateur PostgreSQL
-$password = 'postgres'; // Mot de passe PostgreSQL
+$password = '0151516084'; // Mot de passe PostgreSQL
 
 // Connexion PDO
 try {
