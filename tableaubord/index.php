@@ -83,6 +83,11 @@ $result_Effondrement = $conn->query($sql_Effondrement);
 //Parcourir la table des résultats de la requête
 $row_Effondrement = $result_Effondrement->fetch(PDO::FETCH_ASSOC);
 $total_effondrement = $row_Effondrement['total_effondrement'];
+
+$sql_traite = "SELECT count(*) AS total_traite FROM informations WHERE new_statut = 'traite'";
+$result_traite = $conn->query($sql_traite);
+$row_traite = $result_traite->fetch(PDO::FETCH_ASSOC);
+$total_traite = $row_traite['total_traite'];
 ?>
 
 <!DOCTYPE html>
@@ -162,19 +167,43 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
       /*  margin: auto;
          float: right;*/
         }
-        /* La barre latérale à droite */
-        #sidebar {
-            width: 300px; /* Largeur du panneau latéral pour les informations */
-            padding: 20px;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-            background-color: #f4f4f4; /* Couleur de fond pour le distinguer */
-           box-sizing: border-box; /* Inclut le padding dans la largeur */
-            overflow-y: auto; /* Permet le défilement si le contenu est trop long */
+        /* Statistiques des risques — déplacée en haut de page */
+        #statistiques {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 16px 20px 20px;
+            margin-bottom: 18px;
+            text-align: center;
         }
+        #statistiques h3 {
+            margin-top: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #333;
+            border-bottom: 2px solid #3c8dbc;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .skip-to-stats {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 5px 14px;
+            background: #3c8dbc;
+            color: #fff !important;
+            border-radius: 3px;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .skip-to-stats:hover { background: #367fa9; }
+        /* Ancienne barre latérale carte — masquée */
+        #sidebar { display: none; }
 
-          /* Style pour le canevas du graphique */
+        /* Graphique */
 #risksPieChart {
-    width: 100% !important; /* Assure que le graphique s'adapte à la largeur du panneau */
+    max-height: 260px;
+    width: auto !important;
     height: auto !important;
 }
 /*la legende*/
@@ -221,8 +250,14 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
       <!-- Main content -->
       <section class="content-header">
         <h1><i class="fa fa-table"></i> Tableau de bord</h1>
+        <a href="#statistiques" class="skip-to-stats"><i class="fa fa-bar-chart"></i> Statistiques des risques &darr;</a>
       </section>
       <section class="content">
+        <!-- Statistiques des risques -->
+        <div id="statistiques">
+          <h3><i class="fa fa-pie-chart"></i> Statistiques des risques</h3>
+          <canvas id="risksPieChart"></canvas>
+        </div>
         <!-- Stat boxes -->
         <div class="row">
           <div class="col-xs-6 col-sm-4 col-md-2">
@@ -235,39 +270,48 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
             </div>
           </div>
           <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-blue">
+            <div class="small-box" style="background:#36A2EB;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_inondation"><?php echo $total_inondation; ?></h3>
+                <h3 id="nombre_inondation" style="color:#fff;"><?php echo $total_inondation; ?></h3>
                 <p>Inondations</p>
               </div>
               <div class="icon"><i class="fa fa-tint"></i></div>
             </div>
           </div>
           <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-yellow">
+            <div class="small-box" style="background:#FFCE56;color:#333;">
               <div class="inner">
-                <h3 id="nombre_erosion"><?php echo $total_erosion; ?></h3>
+                <h3 id="nombre_erosion" style="color:#333;"><?php echo $total_erosion; ?></h3>
                 <p>Érosions</p>
               </div>
-              <div class="icon"><i class="fa fa-exclamation-triangle"></i></div>
+              <div class="icon" style="color:rgba(0,0,0,0.15);"><i class="fa fa-exclamation-triangle"></i></div>
             </div>
           </div>
           <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-aqua">
+            <div class="small-box" style="background:#4BC0C0;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_eboulement"><?php echo $total_eboulement; ?></h3>
+                <h3 id="nombre_eboulement" style="color:#fff;"><?php echo $total_eboulement; ?></h3>
                 <p>Éboulements</p>
               </div>
               <div class="icon"><i class="fa fa-warning"></i></div>
             </div>
           </div>
           <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-green">
+            <div class="small-box" style="background:#FF6384;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_effondrement"><?php echo $total_effondrement; ?></h3>
+                <h3 id="nombre_effondrement" style="color:#fff;"><?php echo $total_effondrement; ?></h3>
                 <p>Effondrements</p>
               </div>
               <div class="icon"><i class="fa fa-home"></i></div>
+            </div>
+          </div>
+          <div class="col-xs-6 col-sm-4 col-md-2">
+            <div class="small-box" style="background:#6f42c1;color:#fff;">
+              <div class="inner">
+                <h3 id="nombre_traite" style="color:#fff;"><?php echo $total_traite; ?></h3>
+                <p>Alertes traitées</p>
+              </div>
+              <div class="icon"><i class="fa fa-check-circle"></i></div>
             </div>
           </div>
         </div><!-- /.row -->
@@ -285,10 +329,6 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
     </div>
  </div> 
 
-  <div id="sidebar" class="leaflet-control">
-    <h3>Statistiques des risques</h3>
-    <canvas id="risksPieChart"></canvas>
-</div>
 </div>
         
     </section>
@@ -773,45 +813,32 @@ function updateChart(stats) {
                     }
                     notifiedRiskIds.clear(); // Important : réinitialiser pour la vue "tous"
 
-                   // --- AJOUTEZ CETTE SECTION POUR LES STATISTIQUES GLOBAL ---
-                // Calculer les statistiques à partir des données de risque
+                   // --- STATISTIQUES GLOBAL ---
                 let stats = {
                     tt_inondation: 0,
                     tt_erosion: 0,
                     tt_eboulement: 0,
                     tt_effondrement: 0,
+                    tt_traite: 0,
                     tt_risques: response.length
                 };
-                // Boucle sur TOUS les risques, sans condition sur 'traite'
                 response.forEach(function(risk) {
-                    // Ajoute le marqueur pour chaque risque, la fonction addRiskMarker gère déjà la couleur
-                        addRiskMarker(risk, false);
-                    // Calcul des stats
+                    addRiskMarker(risk, false);
                     switch (risk.risques) {
-                        case 'Inondation':
-                            stats.tt_inondation++;
-                            break;
-                        case 'Erosion':
-                            stats.tt_erosion++;
-                            break;
-                        case 'Eboulement':
-                            stats.tt_eboulement++;
-                            break;
-                        case 'Effondrement':
-                            stats.tt_effondrement++;
-                            break;
+                        case 'Inondation':  stats.tt_inondation++;  break;
+                        case 'Erosion':     stats.tt_erosion++;     break;
+                        case 'Eboulement':  stats.tt_eboulement++;  break;
+                        case 'Effondrement':stats.tt_effondrement++;break;
                     }
-                    if (risk.new_statut === 'traite') {
-                        addRiskMarker(risk, false);
-                    }
+                    if (risk.new_statut === 'traite') stats.tt_traite++;
                 });
-                
-                // Mettre à jour les compteurs HTML
-                document.getElementById('nombre_inondation').textContent = stats.tt_inondation;
-                document.getElementById('nombre_erosion').textContent = stats.tt_erosion;
-                document.getElementById('nombre_eboulement').textContent = stats.tt_eboulement;
+
+                document.getElementById('nombre_inondation').textContent  = stats.tt_inondation;
+                document.getElementById('nombre_erosion').textContent      = stats.tt_erosion;
+                document.getElementById('nombre_eboulement').textContent   = stats.tt_eboulement;
                 document.getElementById('nombre_effondrement').textContent = stats.tt_effondrement;
-                document.getElementById('nombre_risque').textContent = stats.tt_risques;
+                document.getElementById('nombre_traite').textContent       = stats.tt_traite;
+                document.getElementById('nombre_risque').textContent       = stats.tt_risques;
 
                 // Mettre à jour le  type de graphique
                  updatePieChart(stats);
