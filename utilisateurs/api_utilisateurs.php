@@ -30,7 +30,7 @@ switch ($method) {
         // Récupérer un utilisateur spécifique ou tous les utilisateurs
         $id = $_GET['id'] ?? null;
         if ($id) {
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, username, contact1, mail, role, date_creation FROM utilisateurs WHERE id = :id");
+            $stmt = $pdo->prepare("SELECT id, nom, prenom, user_name, contact1, mail, role, date_creation FROM utilisateurs WHERE id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             $user = $stmt->fetch();
@@ -40,7 +40,7 @@ switch ($method) {
                 echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé.']);
             }
         } else {
-            $stmt = $pdo->query("SELECT id, nom, prenom, username, contact1, mail, role, date_creation FROM utilisateurs ORDER BY id DESC");
+            $stmt = $pdo->query("SELECT id, nom, prenom, user_name, contact1, mail, role, date_creation FROM utilisateurs ORDER BY id DESC");
             $users = $stmt->fetchAll();
             echo json_encode(['success' => true, 'data' => $users]);
         }
@@ -49,14 +49,14 @@ switch ($method) {
     case 'POST': // Créer un nouvel utilisateur
         $nom = $input['nom'] ?? '';
         $prenom = $input['prenom'] ?? '';
-        $username = $input['username'] ?? '';
+        $user_name = $input['user_name'] ?? '';
         $contact1 = $input['contact1'] ?? '';
         $mail = $input['mail'] ?? '';
         $mot_de_passe = $input['mot_de_passe'] ?? '';
         $confirm_mot_de_passe = $input['confirm_mot_de_passe'] ?? '';
         $role = $input['role'] ?? 'analyste'; // Par défaut 'analyste'
 
-        if (empty($nom) || empty($prenom) || empty($username) || empty($contact1) || empty($mail) || empty($mot_de_passe) || empty($confirm_mot_de_passe)) {
+        if (empty($nom) || empty($prenom) || empty($user_name) || empty($contact1) || empty($mail) || empty($mot_de_passe) || empty($confirm_mot_de_passe)) {
             echo json_encode(['success' => false, 'message' => 'Tous les champs obligatoires doivent être remplis.']);
             exit();
         }
@@ -80,11 +80,11 @@ switch ($method) {
 
         $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
 
-        $sql = "INSERT INTO utilisateurs (nom, prenom, username, contact1, mail, mot_de_passe, role) VALUES (:nom, :prenom, :username, :contact1, :mail, :mot_de_passe, :role)";
+        $sql = "INSERT INTO utilisateurs (nom, prenom, user_name, contact1, mail, mot_de_passe, role) VALUES (:nom, :prenom, :user_name, :contact1, :mail, :mot_de_passe, :role)";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':nom', $nom);
         $stmt->bindParam(':prenom', $prenom);
-        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':user_name', $user_name);
         $stmt->bindParam(':contact1', $contact1);
         $stmt->bindParam(':mail', $mail);
         $stmt->bindParam(':mot_de_passe', $hashed_password);
@@ -106,14 +106,14 @@ switch ($method) {
 
         $nom = $input['nom'] ?? '';
         $prenom = $input['prenom'] ?? '';
-        $username = $input['username'] ?? '';
+        $user_name = $input['user_name'] ?? '';
         $contact1 = $input['contact1'] ?? '';
         $mail = $input['mail'] ?? '';
         $mot_de_passe = $input['mot_de_passe'] ?? ''; // Optionnel, si vide ne pas changer
         $confirm_mot_de_passe = $input['confirm_mot_de_passe'] ?? '';
         $role = $input['role'] ?? '';
 
-        if (empty($nom) || empty($prenom) || empty($username) || empty($contact1) || empty($mail) || empty($role)) {
+        if (empty($nom) || empty($prenom) || empty($user_name) || empty($contact1) || empty($mail) || empty($role)) {
             echo json_encode(['success' => false, 'message' => 'Tous les champs obligatoires (sauf mot de passe) doivent être remplis.']);
             exit();
         }
@@ -136,7 +136,7 @@ switch ($method) {
             exit();
         }
 
-        $sql = "UPDATE utilisateurs SET nom = :nom, prenom = :prenom, username = :username, contact1 = :contact1, mail = :mail, role = :role";
+        $sql = "UPDATE utilisateurs SET nom = :nom, prenom = :prenom, user_name = :user_name, contact1 = :contact1, mail = :mail, role = :role";
         if (!empty($mot_de_passe)) {
             $hashed_password = password_hash($mot_de_passe, PASSWORD_DEFAULT);
             $sql .= ", mot_de_passe = :mot_de_passe";
@@ -146,7 +146,7 @@ switch ($method) {
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':nom', $nom);
         $stmt->bindParam(':prenom', $prenom);
-        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':user_name', $user_name);
         $stmt->bindParam(':contact1', $contact1);
         $stmt->bindParam(':mail', $mail);
         $stmt->bindParam(':role', $role);
