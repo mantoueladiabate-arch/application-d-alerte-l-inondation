@@ -27,22 +27,30 @@ $input = json_decode(file_get_contents('php://input'), true); // Pour PUT/DELETE
 
 switch ($method) {
     case 'GET':
-        // Récupérer un utilisateur spécifique ou tous les utilisateurs
-        $id = $_GET['id'] ?? null;
-        if ($id) {
-            $stmt = $pdo->prepare("SELECT id, nom, prenom, user_name, contact1, mail, role, date_creation FROM utilisateurs WHERE id = :id");
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-            $user = $stmt->fetch();
-            if ($user) {
-                echo json_encode(['success' => true, 'data' => $user]);
+        try {
+            $id = $_GET['id'] ?? null;
+            // Détecter le nom réel de la colonne username
+            $colCheck = $pdo->query("SELECT column_name FROM information_schema.columns WHERE table_name='utilisateurs' AND column_name IN ('user_name','username') LIMIT 1");
+            $colRow = $colCheck->fetch();
+            $userCol = $colRow ? $colRow['column_name'] : 'user_name';
+
+            if ($id) {
+                $stmt = $pdo->prepare("SELECT id, nom, prenom, $userCol AS user_name, contact1, mail, role, date_creation FROM utilisateurs WHERE id = :id");
+                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                $stmt->execute();
+                $user = $stmt->fetch();
+                if ($user) {
+                    echo json_encode(['success' => true, 'data' => $user]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé.']);
+                }
             } else {
-                echo json_encode(['success' => false, 'message' => 'Utilisateur non trouvé.']);
+                $stmt = $pdo->query("SELECT id, nom, prenom, $userCol AS user_name, contact1, mail, role, date_creation FROM utilisateurs ORDER BY id DESC");
+                $users = $stmt->fetchAll();
+                echo json_encode(['success' => true, 'data' => $users]);
             }
-        } else {
-            $stmt = $pdo->query("SELECT id, nom, prenom, user_name, contact1, mail, role, date_creation FROM utilisateurs ORDER BY id DESC");
-            $users = $stmt->fetchAll();
-            echo json_encode(['success' => true, 'data' => $users]);
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur BD : ' . $e->getMessage()]);
         }
         break;
 

@@ -13,12 +13,30 @@ function sidebarActive($current, $keyword) {
 ?>
 <aside class="main-sidebar">
   <section class="sidebar">
-    <div class="user-panel" style="padding:10px 15px 5px;">
-      <div class="info">
-        <a href="<?= $base ?>/index.php" style="color:#fff; font-weight:bold; font-size:15px;">
+    <div style="padding:12px 15px;overflow:visible;border-bottom:1px solid rgba(255,255,255,0.1);">
+      <?php if (!empty($_SESSION['username'])): ?>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <i class="fa fa-user-circle" style="font-size:32px;color:#aaa;flex-shrink:0;"></i>
+          <div style="min-width:0;">
+            <div style="color:#fff;font-weight:bold;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              <?= htmlspecialchars($_SESSION['username']) ?>
+            </div>
+            <div style="font-size:11px;color:#aaa;margin-bottom:4px;">
+              <?= htmlspecialchars($_SESSION['role'] ?? '') ?>
+            </div>
+            <a href="<?= $base ?>/logout.php" style="font-size:11px;color:#e74c3c;text-decoration:none;">
+              <i class="fa fa-sign-out"></i> Se déconnecter
+            </a>
+          </div>
+        </div>
+      <?php else: ?>
+        <a href="<?= $base ?>/index.php" style="color:#fff;font-weight:bold;font-size:14px;text-decoration:none;">
           <i class="fa fa-shield"></i> Alerte Inondation
+        </a><br>
+        <a href="<?= $base ?>/index.php?login=1" style="font-size:11px;color:#5bc0de;text-decoration:none;">
+          <i class="fa fa-sign-in"></i> Se connecter
         </a>
-      </div>
+      <?php endif; ?>
     </div>
     <ul class="sidebar-menu">
 

@@ -165,9 +165,7 @@ try {
     <!-- Hero section -->
     <div class="home-page">
       <div class="login-container">
-        <?php if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
-          <a href="logout.php" class="login-button">Se déconnecter</a>
-        <?php else: ?>
+        <?php if (!isset($_SESSION['user_id'])): ?>
           <a href="#" class="login-button" onclick="document.getElementById('login-modal').style.display='block'">Se connecter</a>
         <?php endif; ?>
       </div>
@@ -296,6 +294,10 @@ try {
     var m = document.getElementById('login-modal');
     if (e.target === m) m.style.display = 'none';
   };
+  // Auto-ouvrir le modal si ?login=1 dans l'URL
+  if (new URLSearchParams(window.location.search).get('login') === '1') {
+    document.getElementById('login-modal').style.display = 'block';
+  }
   function toggleAnswer(el) {
     var item   = el.closest('.faq-item');
     var answer = item.querySelector('.faq-answer');

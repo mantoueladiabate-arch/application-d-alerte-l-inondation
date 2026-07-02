@@ -19,7 +19,12 @@ try {
     $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $stmt = $pdo->prepare("SELECT id, nom, prenom, user_name, role, mot_de_passe FROM utilisateurs WHERE user_name = :username");
+    // Détection automatique du nom de colonne selon la machine
+    $colCheck = $pdo->query("SELECT column_name FROM information_schema.columns WHERE table_name='utilisateurs' AND column_name IN ('user_name','username') LIMIT 1");
+    $colRow   = $colCheck->fetch(PDO::FETCH_ASSOC);
+    $userCol  = $colRow ? $colRow['column_name'] : 'user_name';
+
+    $stmt = $pdo->prepare("SELECT id, nom, prenom, $userCol AS user_name, role, mot_de_passe FROM utilisateurs WHERE $userCol = :username");
     $stmt->execute([':username' => $username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -31,7 +36,7 @@ try {
         $_SESSION['role']     = $user['role'];
 
         // Redirection selon le role
-        if ($user['role'] === 'admin' || $user['role'] === 'administrateur') {
+        if (in_array($user['role'], ['admin', 'administrateur'])) {
             header('Location: utilisateurs/index.php');
         } else {
             header('Location: analyste/index.php');

@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'administrateur') {
-    header('Location: ../index.php');
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'administrateur'])) {
+    header('Location: ../index.php?login=1');
     exit;
 }
 ?>
@@ -69,7 +69,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'administrateur') {
           <div class="row">
             <div class="form-group col-md-6"><label>Nom</label><input type="text" class="form-control" name="nom" required></div>
             <div class="form-group col-md-6"><label>Prénom</label><input type="text" class="form-control" name="prenom" required></div>
-            <div class="form-group col-md-6"><label>Nom d'utilisateur</label><input type="text" class="form-control" name="username" required></div>
+            <div class="form-group col-md-6"><label>Nom d'utilisateur</label><input type="text" class="form-control" name="user_name" required></div>
             <div class="form-group col-md-6"><label>Contact 1</label><input type="tel" class="form-control" name="contact1" required></div>
             <div class="form-group col-md-6"><label>Email</label><input type="email" class="form-control" name="mail" required></div>
             <div class="form-group col-md-6"><label>Rôle</label>
@@ -102,7 +102,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'administrateur') {
           <input type="hidden" id="edit_id" name="id">
           <div class="form-group"><label>Nom</label><input type="text" class="form-control" id="edit_nom" name="nom" required></div>
           <div class="form-group"><label>Prénom</label><input type="text" class="form-control" id="edit_prenom" name="prenom" required></div>
-          <div class="form-group"><label>Nom d'utilisateur</label><input type="text" class="form-control" id="edit_username" name="username" required></div>
+          <div class="form-group"><label>Nom d'utilisateur</label><input type="text" class="form-control" id="edit_username" name="user_name" required></div>
           <div class="form-group"><label>Contact 1</label><input type="tel" class="form-control" id="edit_contact1" name="contact1" required></div>
           <div class="form-group"><label>Email</label><input type="email" class="form-control" id="edit_mail" name="mail" required></div>
           <div class="form-group"><label>Rôle</label>
@@ -149,7 +149,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'administrateur') {
               '<td>' + u.id + '</td>' +
               '<td>' + u.nom + '</td>' +
               '<td>' + u.prenom + '</td>' +
-              '<td>' + u.username + '</td>' +
+              '<td>' + u.user_name + '</td>' +
               '<td>' + u.contact1 + '</td>' +
               '<td>' + u.mail + '</td>' +
               '<td><span class="label label-' + (u.role === 'administrateur' ? 'danger' : 'info') + '">' + u.role + '</span></td>' +
@@ -194,7 +194,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'administrateur') {
             document.getElementById('edit_id').value        = u.id;
             document.getElementById('edit_nom').value       = u.nom;
             document.getElementById('edit_prenom').value    = u.prenom;
-            document.getElementById('edit_username').value  = u.username;
+            document.getElementById('edit_username').value  = u.user_name;
             document.getElementById('edit_contact1').value  = u.contact1;
             document.getElementById('edit_mail').value      = u.mail;
             document.getElementById('edit_role').value      = u.role;
