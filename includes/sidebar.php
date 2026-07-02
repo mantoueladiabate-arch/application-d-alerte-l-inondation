@@ -1,5 +1,10 @@
 <?php
-$base    = '/application-d-alerte-l-inondation';
+// Chemin URL de la racine du projet, détecté automatiquement
+$base = rtrim(str_replace(
+    str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']),
+    '',
+    str_replace('\\', '/', dirname(__DIR__))
+), '/');
 $current = $_SERVER['PHP_SELF'] ?? '';
 
 function sidebarActive($current, $keyword) {
