@@ -88,6 +88,48 @@ $sql_traite = "SELECT count(*) AS total_traite FROM informations WHERE new_statu
 $result_traite = $conn->query($sql_traite);
 $row_traite = $result_traite->fetch(PDO::FETCH_ASSOC);
 $total_traite = $row_traite['total_traite'];
+
+$sql_non_traite = "SELECT count(*) AS total_non_traite FROM informations WHERE new_statut = 'non_traite'";
+$result_non_traite = $conn->query($sql_non_traite);
+$row_non_traite = $result_non_traite->fetch(PDO::FETCH_ASSOC);
+$total_non_traite = $row_non_traite['total_non_traite'];
+
+$sql_communes = "SELECT count(DISTINCT commune) AS total_communes FROM informations";
+$result_communes = $conn->query($sql_communes);
+$row_communes = $result_communes->fetch(PDO::FETCH_ASSOC);
+$total_communes = $row_communes['total_communes'];
+
+// Barres : traités vs non traités par type de risque
+$sql_bar = "SELECT risques,
+    SUM(CASE WHEN new_statut = 'traite'     THEN 1 ELSE 0 END) AS traite,
+    SUM(CASE WHEN new_statut = 'non_traite' THEN 1 ELSE 0 END) AS non_traite
+FROM informations
+WHERE risques IN ('Inondation','Erosion','Eboulement','Effondrement')
+GROUP BY risques
+ORDER BY risques";
+$bar_data = ['labels'=>[], 'traite'=>[], 'non_traite'=>[]];
+foreach ($conn->query($sql_bar) as $r) {
+    $bar_data['labels'][]     = $r['risques'];
+    $bar_data['traite'][]     = (int)$r['traite'];
+    $bar_data['non_traite'][] = (int)$r['non_traite'];
+}
+$bar_json = json_encode($bar_data);
+
+// Courbe : évolution mensuelle des signalements (12 derniers mois)
+$sql_line = "SELECT TO_CHAR(date::date, 'Mon YYYY') AS mois,
+                    TO_CHAR(date::date, 'YYYY-MM')  AS mois_sort,
+                    count(*) AS total
+FROM informations
+WHERE date IS NOT NULL
+GROUP BY TO_CHAR(date::date, 'YYYY-MM'), TO_CHAR(date::date, 'Mon YYYY')
+ORDER BY TO_CHAR(date::date, 'YYYY-MM')
+LIMIT 12";
+$line_data = ['labels'=>[], 'totals'=>[]];
+foreach ($conn->query($sql_line) as $r) {
+    $line_data['labels'][] = $r['mois'];
+    $line_data['totals'][] = (int)$r['total'];
+}
+$line_json = json_encode($line_data);
 ?>
 
 <!DOCTYPE html>
@@ -125,13 +167,11 @@ $total_traite = $row_traite['total_traite'];
       }
       /*contenant du navigateur du titre des type de risque*/
 .small-box {
-    transition: transform .2s ease, box-shadow .2s ease;
     border-radius: 6px;
     overflow: hidden;
 }
 .small-box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.08);
     cursor: pointer;
 }
 .small-box .inner {
@@ -167,6 +207,11 @@ $total_traite = $row_traite['total_traite'];
       /*  margin: auto;
          float: right;*/
         }
+        /* KPI cards — s'étirent pour remplir toute la largeur */
+        @media (min-width: 992px) {
+            .kpi-col { flex: 1 1 0; width: auto !important; }
+            .kpi-col .small-box { height: 100%; }
+        }
         /* Statistiques des risques — déplacée en haut de page */
         #statistiques {
             background: #f4f4f4;
@@ -200,11 +245,9 @@ $total_traite = $row_traite['total_traite'];
         /* Ancienne barre latérale carte — masquée */
         #sidebar { display: none; }
 
-        /* Graphique */
-#risksPieChart {
+        /* Graphiques statistiques */
+#statistiques canvas {
     max-height: 260px;
-    width: auto !important;
-    height: auto !important;
 }
 /*la legende*/
         .ocsControl leaflet-control,{
@@ -255,12 +298,25 @@ $total_traite = $row_traite['total_traite'];
       <section class="content">
         <!-- Statistiques des risques -->
         <div id="statistiques">
-          <h3><i class="fa fa-pie-chart"></i> Statistiques des risques</h3>
-          <canvas id="risksPieChart"></canvas>
+          <h3><i class="fa fa-bar-chart"></i> Statistiques des risques</h3>
+          <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <p style="text-align:center;font-size:12px;color:#666;margin-bottom:6px;">Répartition par type</p>
+              <canvas id="risksPieChart"></canvas>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <p style="text-align:center;font-size:12px;color:#666;margin-bottom:6px;">Traités vs Non traités</p>
+              <canvas id="risksBarChart"></canvas>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <p style="text-align:center;font-size:12px;color:#666;margin-bottom:6px;">Évolution mensuelle</p>
+              <canvas id="risksLineChart"></canvas>
+            </div>
+          </div>
         </div>
         <!-- Stat boxes -->
-        <div class="row">
-          <div class="col-xs-6 col-sm-4 col-md-2">
+        <div class="row" style="display:flex;flex-wrap:wrap;">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box bg-red">
               <div class="inner">
                 <h3 id="nombre_risque"><?php echo $total_risque; ?></h3>
@@ -269,7 +325,7 @@ $total_traite = $row_traite['total_traite'];
               <div class="icon"><i class="fa fa-map-marker"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box" style="background:#36A2EB;color:#fff;">
               <div class="inner">
                 <h3 id="nombre_inondation" style="color:#fff;"><?php echo $total_inondation; ?></h3>
@@ -278,7 +334,7 @@ $total_traite = $row_traite['total_traite'];
               <div class="icon"><i class="fa fa-tint"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box" style="background:#FFCE56;color:#333;">
               <div class="inner">
                 <h3 id="nombre_erosion" style="color:#333;"><?php echo $total_erosion; ?></h3>
@@ -287,7 +343,7 @@ $total_traite = $row_traite['total_traite'];
               <div class="icon" style="color:rgba(0,0,0,0.15);"><i class="fa fa-exclamation-triangle"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box" style="background:#4BC0C0;color:#fff;">
               <div class="inner">
                 <h3 id="nombre_eboulement" style="color:#fff;"><?php echo $total_eboulement; ?></h3>
@@ -296,22 +352,13 @@ $total_traite = $row_traite['total_traite'];
               <div class="icon"><i class="fa fa-warning"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box" style="background:#FF6384;color:#fff;">
               <div class="inner">
                 <h3 id="nombre_effondrement" style="color:#fff;"><?php echo $total_effondrement; ?></h3>
                 <p>Effondrements</p>
               </div>
               <div class="icon"><i class="fa fa-home"></i></div>
-            </div>
-          </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box" style="background:#6f42c1;color:#fff;">
-              <div class="inner">
-                <h3 id="nombre_traite" style="color:#fff;"><?php echo $total_traite; ?></h3>
-                <p>Alertes traitées</p>
-              </div>
-              <div class="icon"><i class="fa fa-check-circle"></i></div>
             </div>
           </div>
         </div><!-- /.row -->
@@ -485,6 +532,70 @@ $total_traite = $row_traite['total_traite'];
         return xhr;
     }
     
+    // Données PHP injectées en JS
+    var barData  = <?= $bar_json ?>;
+    var lineData = <?= $line_json ?>;
+
+    var risksBarChart, risksLineChart;
+
+    function initBarChart() {
+        var canvas = document.getElementById('risksBarChart');
+        if (!canvas) return;
+        risksBarChart = new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: barData.labels,
+                datasets: [
+                    {
+                        label: 'Traités',
+                        data: barData.traite,
+                        backgroundColor: 'rgba(39,174,96,0.8)',
+                        borderColor: 'rgba(39,174,96,1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Non traités',
+                        data: barData.non_traite,
+                        backgroundColor: 'rgba(231,76,60,0.8)',
+                        borderColor: 'rgba(231,76,60,1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
+    function initLineChart() {
+        var canvas = document.getElementById('risksLineChart');
+        if (!canvas) return;
+        risksLineChart = new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: lineData.labels,
+                datasets: [{
+                    label: 'Signalements',
+                    data: lineData.totals,
+                    borderColor: 'rgba(60,141,188,1)',
+                    backgroundColor: 'rgba(60,141,188,0.15)',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
     // Fonction pour initialiser le diagramme circulaire
     function initPieChart() {
         var canvasPie = document.getElementById('risksPieChart');
@@ -820,7 +931,9 @@ function updateChart(stats) {
                     tt_eboulement: 0,
                     tt_effondrement: 0,
                     tt_traite: 0,
-                    tt_risques: response.length
+                    tt_non_traite: 0,
+                    tt_risques: response.length,
+                    communes: new Set()
                 };
                 response.forEach(function(risk) {
                     addRiskMarker(risk, false);
@@ -830,14 +943,15 @@ function updateChart(stats) {
                         case 'Eboulement':  stats.tt_eboulement++;  break;
                         case 'Effondrement':stats.tt_effondrement++;break;
                     }
-                    if (risk.new_statut === 'traite') stats.tt_traite++;
+                    if (risk.new_statut === 'traite')     stats.tt_traite++;
+                    if (risk.new_statut === 'non_traite') stats.tt_non_traite++;
+                    if (risk.commune) stats.communes.add(risk.commune);
                 });
 
                 document.getElementById('nombre_inondation').textContent  = stats.tt_inondation;
                 document.getElementById('nombre_erosion').textContent      = stats.tt_erosion;
                 document.getElementById('nombre_eboulement').textContent   = stats.tt_eboulement;
                 document.getElementById('nombre_effondrement').textContent = stats.tt_effondrement;
-                document.getElementById('nombre_traite').textContent       = stats.tt_traite;
                 document.getElementById('nombre_risque').textContent       = stats.tt_risques;
 
                 // Mettre à jour le  type de graphique
@@ -1070,8 +1184,10 @@ function updateChart(stats) {
 
         // Appel initial pour charger tous les risques sur la carte
         loadAllRisksInitially();
-        // Initialiser et mettre à jour le diagramme circulaire
-    initPieChart();
+        // Initialiser les graphiques
+        initPieChart();
+        initBarChart();
+        initLineChart();
     // Charger les risques initialement et mettre à jour le diagramme
         loadAllRisksInitially(); 
         // Démarre la vérification régulière des nouveaux risques toutes les 15 secondes
