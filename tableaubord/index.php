@@ -115,20 +115,17 @@ foreach ($conn->query($sql_bar) as $r) {
 }
 $bar_json = json_encode($bar_data);
 
-// Courbe : évolution mensuelle des signalements (12 derniers mois)
-$sql_line = "SELECT TO_CHAR(date::date, 'Mon YYYY') AS mois,
-                    TO_CHAR(date::date, 'YYYY-MM')  AS mois_sort,
-                    count(*) AS total
-FROM informations
-WHERE date IS NOT NULL
-GROUP BY TO_CHAR(date::date, 'YYYY-MM'), TO_CHAR(date::date, 'Mon YYYY')
-ORDER BY TO_CHAR(date::date, 'YYYY-MM')
-LIMIT 12";
-$line_data = ['labels'=>[], 'totals'=>[]];
-foreach ($conn->query($sql_line) as $r) {
-    $line_data['labels'][] = $r['mois'];
-    $line_data['totals'][] = (int)$r['total'];
-}
+// Alertes par année 2025/2026 — filtrage PHP pour ignorer données invalides
+$line_data = ['labels'=>['2025','2026'], 'totals'=>[0, 0]];
+try {
+    foreach ($conn->query('SELECT "date" FROM informations WHERE "date" IS NOT NULL') as $r) {
+        if (preg_match('/^(\d{4})/', trim((string)$r['date']), $m)) {
+            $yr = (int)$m[1];
+            if ($yr === 2025) $line_data['totals'][0]++;
+            if ($yr === 2026) $line_data['totals'][1]++;
+        }
+    }
+} catch (PDOException $e) { /* ignoré */ }
 $line_json = json_encode($line_data);
 ?>
 
@@ -309,7 +306,7 @@ $line_json = json_encode($line_data);
               <canvas id="risksBarChart"></canvas>
             </div>
             <div class="col-xs-12 col-md-4">
-              <p style="text-align:center;font-size:12px;color:#666;margin-bottom:6px;">Évolution mensuelle</p>
+              <p style="text-align:center;font-size:12px;color:#666;margin-bottom:6px;">Alertes par année (2025 / 2026)</p>
               <canvas id="risksLineChart"></canvas>
             </div>
           </div>
@@ -574,18 +571,15 @@ $line_json = json_encode($line_data);
         var canvas = document.getElementById('risksLineChart');
         if (!canvas) return;
         risksLineChart = new Chart(canvas.getContext('2d'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: lineData.labels,
                 datasets: [{
-                    label: 'Signalements',
+                    label: 'Alertes',
                     data: lineData.totals,
-                    borderColor: 'rgba(60,141,188,1)',
-                    backgroundColor: 'rgba(60,141,188,0.15)',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    fill: true,
-                    tension: 0.3
+                    backgroundColor: ['rgba(60,141,188,0.8)', 'rgba(39,174,96,0.8)'],
+                    borderColor:     ['rgba(60,141,188,1)',   'rgba(39,174,96,1)'],
+                    borderWidth: 1
                 }]
             },
             options: {

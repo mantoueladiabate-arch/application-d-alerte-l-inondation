@@ -17,15 +17,10 @@ $base    = __DIR__ . '/data';
 $webBase = 'data';
 
 $albums = [
-    'Toutes'      => scanImages($base,         $webBase),
-    '2019'        => scanImages($base . '/2019', $webBase . '/2019'),
-    '2020'        => scanImages($base . '/2020', $webBase . '/2020'),
-    'Anyama'      => array_values(array_filter(
-                        scanImages($base, $webBase),
-                        fn($f) => stripos($f, 'ANYAMA') !== false
-                     )),
+    'Toutes' => scanImages($base,          $webBase),
+    '2025'   => scanImages($base . '/2025', $webBase . '/2025'),
+    '2026'   => scanImages($base . '/2026', $webBase . '/2026'),
 ];
-// Retirer les images Anyama du groupe "Toutes" pour éviter les doublons ? Non, on les garde toutes.
 ?>
 <!DOCTYPE html>
 <html>

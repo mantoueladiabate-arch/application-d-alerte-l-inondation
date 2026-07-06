@@ -54,6 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
         $file = basename($_FILES['file']['name']);
         if (move_uploaded_file($_FILES['file']['tmp_name'], $targetDir . $file)) {
+            // Copie dans la galerie selon l'année de la date saisie
+            $annee = $date ? date('Y', strtotime($date)) : date('Y');
+            $galleryDir = __DIR__ . '/../documentation/data/' . $annee . '/';
+            if (!is_dir($galleryDir)) mkdir($galleryDir, 0777, true);
+            copy($targetDir . $file, $galleryDir . $file);
             $dateExpr = $date ? ':date' : 'NOW()';
             $stmt = $conn->prepare("
                 INSERT INTO informations (commune, quartier, risques, description, date, fichier, longitude, latitude)

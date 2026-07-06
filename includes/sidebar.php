@@ -52,9 +52,9 @@ function sidebarActive($current, $keyword) {
         <a href="<?= $base ?>/analyste/index.php"><i class="fa fa-map-marker"></i><span>Analystes</span></a>
       </li>
 
-      <li class="treeview <?= sidebarActive($current, 'statistique') ?>">
+      <?php /* <li class="treeview <?= sidebarActive($current, 'statistique') ?>">
         <a href="<?= $base ?>/statistique/index.php"><i class="fa fa-bar-chart"></i><span>Statistique</span></a>
-      </li>
+      </li> */ ?>
 
       <li class="treeview <?= sidebarActive($current, 'contact') ?>">
         <a href="<?= $base ?>/contact/index.php"><i class="fa fa-exclamation-triangle"></i><span>Émettre une alerte</span></a>

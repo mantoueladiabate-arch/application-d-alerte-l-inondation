@@ -113,14 +113,16 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
       }
 
 .small-box {
-    transition: transform .2s ease, box-shadow .2s ease;
     border-radius: 6px;
     overflow: hidden;
 }
 .small-box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.08);
     cursor: pointer;
+}
+@media (min-width: 992px) {
+    .kpi-col { flex: 1 1 0; width: auto !important; }
+    .kpi-col .small-box { height: 100%; }
 }
 .small-box .inner {
     padding: 12px 14px 10px;
@@ -202,8 +204,8 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
       </section>
       <section class="content">
         <!-- Stat boxes -->
-        <div class="row">
-          <div class="col-xs-6 col-sm-4 col-md-2">
+        <div class="row" style="display:flex;flex-wrap:wrap;">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
             <div class="small-box bg-red">
               <div class="inner">
                 <h3 id="nombre_risque"><?php echo $total_risque; ?></h3>
@@ -212,37 +214,37 @@ $total_effondrement = $row_Effondrement['total_effondrement'];
               <div class="icon"><i class="fa fa-map-marker"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-blue">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
+            <div class="small-box" style="background:#36A2EB;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_inondation"><?php echo $total_inondation; ?></h3>
+                <h3 id="nombre_inondation" style="color:#fff;"><?php echo $total_inondation; ?></h3>
                 <p>Inondations</p>
               </div>
               <div class="icon"><i class="fa fa-tint"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-yellow">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
+            <div class="small-box" style="background:#FFCE56;color:#333;">
               <div class="inner">
-                <h3 id="nombre_erosion"><?php echo $total_erosion; ?></h3>
+                <h3 id="nombre_erosion" style="color:#333;"><?php echo $total_erosion; ?></h3>
                 <p>Érosions</p>
               </div>
-              <div class="icon"><i class="fa fa-exclamation-triangle"></i></div>
+              <div class="icon" style="color:rgba(0,0,0,0.15);"><i class="fa fa-exclamation-triangle"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-aqua">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
+            <div class="small-box" style="background:#4BC0C0;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_eboulement"><?php echo $total_eboulement; ?></h3>
+                <h3 id="nombre_eboulement" style="color:#fff;"><?php echo $total_eboulement; ?></h3>
                 <p>Éboulements</p>
               </div>
               <div class="icon"><i class="fa fa-warning"></i></div>
             </div>
           </div>
-          <div class="col-xs-6 col-sm-4 col-md-2">
-            <div class="small-box bg-green">
+          <div class="col-xs-6 col-sm-4 col-md-2 kpi-col">
+            <div class="small-box" style="background:#FF6384;color:#fff;">
               <div class="inner">
-                <h3 id="nombre_effondrement"><?php echo $total_effondrement; ?></h3>
+                <h3 id="nombre_effondrement" style="color:#fff;"><?php echo $total_effondrement; ?></h3>
                 <p>Effondrements</p>
               </div>
               <div class="icon"><i class="fa fa-home"></i></div>
