@@ -35,7 +35,7 @@ try {
             SELECT id, commune, quartier, risques, description, fichier,
                    latitude, longitude, date, new_statut, recommandation
             FROM informations
-            WHERE id = :id AND new_statut = 'traite'");
+            WHERE id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetch();
@@ -50,7 +50,6 @@ try {
             SELECT id, commune, quartier, risques, description, fichier,
                    latitude, longitude, date, new_statut, recommandation
             FROM informations
-            WHERE new_statut = 'traite'
             ORDER BY date DESC");
         $rows = $stmt->fetchAll();
         foreach ($rows as &$row) {

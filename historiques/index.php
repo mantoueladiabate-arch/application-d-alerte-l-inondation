@@ -53,7 +53,7 @@
                     <th>Risque</th>
                     <th>Fichier</th>
                     <th>Description</th>
-                    <th>Recommandation</th>
+                    <th>Statut</th>
                     <th>Détails</th>
                   </tr>
                 </thead>
@@ -127,11 +127,15 @@ $(document).ready(function() {
             { data: 'risques' },
             { data: 'fichier', orderable: false, searchable: false,
               render: function(data) {
-                if (!data) return '<span class="text-muted">Aucun</span>';
-                var ext = data.split('.').pop().toLowerCase();
-                return ['jpg','jpeg','png','gif','mp4','mov','webm'].indexOf(ext) >= 0
-                       ? '<i class="fa fa-paperclip"></i> Fichier'
-                       : '<i class="fa fa-file"></i> Fichier';
+                if (!data) return '<span class="text-muted">—</span>';
+                var path = BASE_FILE + encodeURIComponent(data);
+                var ext  = data.split('.').pop().toLowerCase();
+                if (['jpg','jpeg','png','gif','webp'].indexOf(ext) >= 0) {
+                  return '<img src="'+path+'" style="height:50px;width:70px;object-fit:cover;border-radius:3px;cursor:pointer;" onclick="window.open(\''+path+'\',\'_blank\')" title="'+data+'">';
+                } else if (['mp4','mov','webm'].indexOf(ext) >= 0) {
+                  return '<span class="label label-info"><i class="fa fa-film"></i> Vidéo</span>';
+                }
+                return '<a href="'+path+'" target="_blank"><i class="fa fa-file"></i> Doc</a>';
               }
             },
             { data: 'description',
@@ -140,10 +144,11 @@ $(document).ready(function() {
                 return data.length > 60 ? data.substr(0,60)+'…' : data;
               }
             },
-            { data: 'recommandation',
+            { data: 'new_statut',
               render: function(data) {
-                if (!data) return '<em class="text-muted">Non renseigné</em>';
-                return data.length > 60 ? data.substr(0,60)+'…' : data;
+                if (!data || data === 'non_traite') return '<span class="label label-warning">Non traité</span>';
+                if (data === 'traite') return '<span class="label label-success">Traité</span>';
+                return '<span class="label label-default">'+data+'</span>';
               }
             },
             { data: null, defaultContent: '<button class="btn btn-info btn-xs view-details"><i class="fa fa-eye"></i> Détails</button>',
