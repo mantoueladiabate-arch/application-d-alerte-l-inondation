@@ -108,8 +108,8 @@
 
 <script>
 $(document).ready(function() {
-    var API_URL      = 'http://localhost/application-d-alerte-l-inondation/historiques/api_historiques.php';
-    var BASE_FILE    = '/application-d-alerte-l-inondation/contact/informations/';
+    var API_URL      = 'api_historiques.php';
+    var BASE_FILE    = '../contact/informations/';
 
     var table = $('#incidentsTable').DataTable({
         language: { url: './i18n/French.json' },

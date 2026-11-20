@@ -1,10 +1,11 @@
 <?php
-// Chemin URL de la racine du projet, détecté automatiquement
-$base = rtrim(str_replace(
-    str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']),
-    '',
-    str_replace('\\', '/', dirname(__DIR__))
-), '/');
+// Préfixe relatif vers la racine du projet. Volontairement 100% relatif (pas de
+// chemin absolu, pas de dépendance à DOCUMENT_ROOT/nom de sous-dossier) pour que
+// la navigation marche à l'identique quel que soit le domaine/chemin de déploiement
+// (local via MAMP, ou en production sur un vrai serveur), sans aucune config à refaire.
+$moduleDirs = ['historiques', 'documentation', 'contact', 'analyste', 'statistique', 'tableaubord', 'ajout_contact', 'utilisateurs'];
+$scriptDir  = basename(dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+$base       = in_array($scriptDir, $moduleDirs, true) ? '..' : '.';
 $current = $_SERVER['PHP_SELF'] ?? '';
 
 function sidebarActive($current, $keyword) {
