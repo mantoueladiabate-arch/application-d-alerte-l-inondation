@@ -1,0 +1,39 @@
+services:
+  app:
+    image: ghcr.io/mantoueladiabate-arch/application-d-alerte-l-inondation:latest
+    container_name: alerte-inondation-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      - db
+    networks:
+      - proxy_default
+      - alerte_internal
+    expose:
+      - "80"
+    volumes:
+      - uploads:/var/www/html/contact/informations
+
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: alerte-inondation-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: base_inondation
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - alerte_internal
+
+networks:
+  proxy_default:
+    external: true
+  alerte_internal:
+
+volumes:
+  db_data:
+  uploads:
