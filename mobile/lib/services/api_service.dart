@@ -17,7 +17,7 @@ class ApiService {
   static Map<String, String> get _headers => {'X-Api-Key': mobileApiKey};
 
   static Future<List<Map<String, dynamic>>> fetchCommunes() async {
-    final uri = Uri.parse('$apiBaseUrl/api_communes.php');
+    final uri = Uri.parse('$apiRootUrl/contact/api_communes.php');
     final response = await http.get(uri, headers: _headers);
     final body = jsonDecode(response.body);
     if (response.statusCode == 200 && body['success'] == true) {
@@ -27,7 +27,7 @@ class ApiService {
   }
 
   static Future<GeocodeResult> reverseGeocode(double lat, double lon) async {
-    final uri = Uri.parse('$apiBaseUrl/api_geocode.php?lat=$lat&lon=$lon');
+    final uri = Uri.parse('$apiRootUrl/contact/api_geocode.php?lat=$lat&lon=$lon');
     final response = await http.get(uri);
     final body = jsonDecode(response.body);
     if (body['success'] != true) return GeocodeResult();
@@ -39,6 +39,18 @@ class ApiService {
     );
   }
 
+  static Future<List<Map<String, dynamic>>> fetchAlertesRecentes() async {
+    final uri = Uri.parse('$apiRootUrl/historiques/api_historiques.php');
+    final response = await http.get(uri);
+    final body = jsonDecode(response.body);
+    if (response.statusCode == 200 && body['success'] == true) {
+      return List<Map<String, dynamic>>.from(body['data']);
+    }
+    throw Exception(body['message'] ?? 'Impossible de charger les alertes récentes.');
+  }
+
+  static String fileUrl(String fichier) => '$apiRootUrl/contact/informations/$fichier';
+
   static Future<String> submitAlerte({
     required int communeId,
     required String quartier,
@@ -49,7 +61,7 @@ class ApiService {
     required double longitude,
     required File file,
   }) async {
-    final uri = Uri.parse('$apiBaseUrl/api_alerte.php');
+    final uri = Uri.parse('$apiRootUrl/contact/api_alerte.php');
     final request = http.MultipartRequest('POST', uri)
       ..headers.addAll(_headers)
       ..fields['commune'] = communeId.toString()

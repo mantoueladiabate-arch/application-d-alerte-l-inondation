@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/report_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const AlerteInondationApp());
@@ -15,7 +15,7 @@ class AlerteInondationApp extends StatelessWidget {
       title: 'Alerte Inondation',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
-      home: const ReportScreen(),
+      home: const SplashScreen(),
     );
   }
 }
