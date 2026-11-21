@@ -12,11 +12,17 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
+  final _alertsListKey = GlobalKey<AlertsListScreenState>();
 
-  static const _screens = [
-    ReportScreen(),
-    AlertsListScreen(),
+  late final _screens = [
+    const ReportScreen(),
+    AlertsListScreen(key: _alertsListKey),
   ];
+
+  void _onDestinationSelected(int i) {
+    setState(() => _index = i);
+    if (i == 1) _alertsListKey.currentState?.refresh();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +30,7 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        onDestinationSelected: _onDestinationSelected,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.report_problem_outlined),

@@ -9,10 +9,10 @@ class AlertsListScreen extends StatefulWidget {
   const AlertsListScreen({super.key});
 
   @override
-  State<AlertsListScreen> createState() => _AlertsListScreenState();
+  State<AlertsListScreen> createState() => AlertsListScreenState();
 }
 
-class _AlertsListScreenState extends State<AlertsListScreen> {
+class AlertsListScreenState extends State<AlertsListScreen> {
   late Future<List<Map<String, dynamic>>> _future;
 
   @override
@@ -21,7 +21,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
     _future = ApiService.fetchAlertesRecentes();
   }
 
-  Future<void> _refresh() async {
+  Future<void> refresh() async {
     final future = ApiService.fetchAlertesRecentes();
     setState(() => _future = future);
     await future;
@@ -32,7 +32,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Alertes récentes')),
       body: RefreshIndicator(
-        onRefresh: _refresh,
+        onRefresh: refresh,
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _future,
           builder: (context, snapshot) {
