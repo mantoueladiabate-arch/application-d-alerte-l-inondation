@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL); // Affiche toutes les erreurs, avertissements, etc.
 ini_set('display_errors', 1); // Force l'affichage à l'écran
+ob_start();
 require_once __DIR__ . '/config.php';
 
 function connect() {
