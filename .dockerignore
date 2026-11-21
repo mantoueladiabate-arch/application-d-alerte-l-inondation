@@ -4,6 +4,7 @@ mobile
 database/seed_local.php
 database/gen_hash.php
 database/import_geodata.php
+create_admin.php
 documentation - Copie
 *.md
 .claude
