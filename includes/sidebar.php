@@ -1,4 +1,5 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Préfixe relatif vers la racine du projet. Volontairement 100% relatif (pas de
 // chemin absolu, pas de dépendance à DOCUMENT_ROOT/nom de sous-dossier) pour que
 // la navigation marche à l'identique quel que soit le domaine/chemin de déploiement

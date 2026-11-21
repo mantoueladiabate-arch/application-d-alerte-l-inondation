@@ -1,4 +1,5 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // Récupère les images par dossier
 function scanImages($dir, $webPath) {
     $exts = ['jpg','jpeg','png','gif','webp'];
