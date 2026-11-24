@@ -47,7 +47,7 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilan Post-Crise</title>
+    <title>Bilan</title>
 
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -98,7 +98,7 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
 
   <div class="content-wrapper">
     <section class="content-header">
-      <h1><i class="fa fa-file-text-o"></i> Bilans Post-Crise</h1>
+      <h1><i class="fa fa-file-text-o"></i> Bilans</h1>
     </section>
 
     <section class="content">
@@ -107,7 +107,7 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
     <!-- ÉTAPE 3 : EN-TÊTE, FILTRE PAR STATUT ET BOUTON VERS LE FORMULAIRE -->
     <div class="topbar">
         <div>
-            <h1>Bilans Post-Crise</h1>
+            <h1>Bilans</h1>
             <div class="meta">Actualisé automatiquement dès la validation du formulaire</div>
         </div>
         <div class="actions-top">

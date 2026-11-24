@@ -67,7 +67,7 @@ function sidebarActive($current, $keyword) {
       </li>
 
       <li class="treeview <?= sidebarActive($current, 'fiche_bilan') ?>">
-        <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilans post-crise</span></a>
+        <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilan</span></a>
       </li>
 
       <li class="treeview <?= sidebarActive($current, 'documentation') ?>">
