@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // chemin absolu, pas de dépendance à DOCUMENT_ROOT/nom de sous-dossier) pour que
 // la navigation marche à l'identique quel que soit le domaine/chemin de déploiement
 // (local via MAMP, ou en production sur un vrai serveur), sans aucune config à refaire.
-$moduleDirs = ['historiques', 'documentation', 'contact', 'analyste', 'statistique', 'tableaubord', 'ajout_contact', 'utilisateurs'];
+$moduleDirs = ['historiques', 'documentation', 'contact', 'analyste', 'statistique', 'tableaubord', 'ajout_contact', 'utilisateurs', 'fiche_bilan'];
 $scriptDir  = basename(dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 $base       = in_array($scriptDir, $moduleDirs, true) ? '..' : '.';
 $current = $_SERVER['PHP_SELF'] ?? '';
@@ -42,7 +42,7 @@ function sidebarActive($current, $keyword) {
     </div>
     <ul class="sidebar-menu">
 
-      <li class="treeview <?= (basename($current) === 'index.php' && !preg_match('#/(tableaubord|analyste|contact|historiques|documentation|ajout_contact|utilisateurs|statistique)/#', $current)) ? 'active' : '' ?>">
+      <li class="treeview <?= (basename($current) === 'index.php' && !preg_match('#/(tableaubord|analyste|contact|historiques|documentation|ajout_contact|utilisateurs|statistique|fiche_bilan)/#', $current)) ? 'active' : '' ?>">
         <a href="<?= $base ?>/index.php"><i class="fa fa-home"></i><span>Accueil</span></a>
       </li>
 
@@ -64,6 +64,10 @@ function sidebarActive($current, $keyword) {
 
       <li class="treeview <?= sidebarActive($current, 'historiques') ?>">
         <a href="<?= $base ?>/historiques/index.php"><i class="fa fa-history"></i><span>Historiques</span></a>
+      </li>
+
+      <li class="treeview <?= sidebarActive($current, 'fiche_bilan') ?>">
+        <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilans post-crise</span></a>
       </li>
 
       <li class="treeview <?= sidebarActive($current, 'documentation') ?>">
