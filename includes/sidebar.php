@@ -98,15 +98,15 @@ function afficherOnglet($cle, $menusVisibles) {
       </li>
       <?php endif; ?>
 
-      <?php if (afficherOnglet('bilan', $menusVisibles)): ?>
-      <li class="treeview <?= (strpos($current, 'fiche_bilan') !== false && basename($current) !== 'formulaire_bilan.php') ? 'active' : '' ?>">
-        <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilan</span></a>
-      </li>
-      <?php endif; ?>
-
       <?php if (afficherOnglet('fiche_bilan_form', $menusVisibles)): ?>
       <li class="treeview <?= (basename($current) === 'formulaire_bilan.php') ? 'active' : '' ?>">
         <a href="<?= $base ?>/fiche_bilan/formulaire_bilan.php"><i class="fa fa-plus-circle"></i><span>Fiche bilan</span></a>
+      </li>
+      <?php endif; ?>
+
+      <?php if (afficherOnglet('bilan', $menusVisibles)): ?>
+      <li class="treeview <?= (strpos($current, 'fiche_bilan') !== false && basename($current) !== 'formulaire_bilan.php') ? 'active' : '' ?>">
+        <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilan</span></a>
       </li>
       <?php endif; ?>
 

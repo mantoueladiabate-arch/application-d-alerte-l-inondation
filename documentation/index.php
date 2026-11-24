@@ -108,18 +108,6 @@ $albums = [
 
     <section class="content">
 
-      <!-- Texte introductif -->
-      <div class="box box-info">
-        <div class="box-header with-border">
-          <h3 class="box-title">À propos</h3>
-        </div>
-        <div class="box-body">
-          <p>Abidjan, la capitale économique de la Côte d'Ivoire, enregistre pendant les saisons pluvieuses plusieurs types d'inondations :
-          remontée de la nappe phréatique, inondations dans les vallées et cuvettes, submersion marine et débordement des cours d'eau.</p>
-          <p>Les facteurs humains — constructions sur les canalisations, urbanisation galopante — aggravent ces risques et entraînent des pertes en vies humaines et matérielles.</p>
-        </div>
-      </div>
-
       <!-- Onglets par année -->
       <div class="box box-primary">
         <div class="box-header with-border">
