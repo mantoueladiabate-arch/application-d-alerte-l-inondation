@@ -12,6 +12,28 @@ $current = $_SERVER['PHP_SELF'] ?? '';
 function sidebarActive($current, $keyword) {
     return strpos($current, $keyword) !== false ? 'active' : '';
 }
+
+// Onglets visibles selon le rôle : un visiteur non connecté ne voit que l'essentiel,
+// l'analyste a en plus les outils d'analyse/bilan, l'admin a tout en plus de la gestion des comptes.
+$role = $_SESSION['role'] ?? null;
+if (in_array($role, ['admin', 'administrateur'], true)) {
+    $roleKey = 'admin';
+} elseif ($role === 'analyste') {
+    $roleKey = 'analyste';
+} else {
+    $roleKey = 'visiteur';
+}
+
+$menusParRole = [
+    'visiteur' => ['accueil', 'tableaubord', 'contact', 'documentation'],
+    'analyste' => ['accueil', 'tableaubord', 'analyste', 'contact', 'historiques', 'bilan', 'fiche_bilan_form', 'documentation'],
+    'admin'    => ['accueil', 'tableaubord', 'analyste', 'contact', 'historiques', 'bilan', 'fiche_bilan_form', 'documentation', 'ajout_contact', 'liste_contacts', 'utilisateurs'],
+];
+$menusVisibles = $menusParRole[$roleKey];
+
+function afficherOnglet($cle, $menusVisibles) {
+    return in_array($cle, $menusVisibles, true);
+}
 ?>
 <aside class="main-sidebar">
   <section class="sidebar">
@@ -42,49 +64,75 @@ function sidebarActive($current, $keyword) {
     </div>
     <ul class="sidebar-menu">
 
+      <?php if (afficherOnglet('accueil', $menusVisibles)): ?>
       <li class="treeview <?= (basename($current) === 'index.php' && !preg_match('#/(tableaubord|analyste|contact|historiques|documentation|ajout_contact|utilisateurs|statistique|fiche_bilan)/#', $current)) ? 'active' : '' ?>">
         <a href="<?= $base ?>/index.php"><i class="fa fa-home"></i><span>Accueil</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('tableaubord', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'tableaubord') ?>">
         <a href="<?= $base ?>/tableaubord/index.php"><i class="fa fa-table"></i><span>Tableau de bord</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('analyste', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'analyste') ?>">
         <a href="<?= $base ?>/analyste/index.php"><i class="fa fa-map-marker"></i><span>Analystes</span></a>
       </li>
+      <?php endif; ?>
 
       <?php /* <li class="treeview <?= sidebarActive($current, 'statistique') ?>">
         <a href="<?= $base ?>/statistique/index.php"><i class="fa fa-bar-chart"></i><span>Statistique</span></a>
       </li> */ ?>
 
+      <?php if (afficherOnglet('contact', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'contact') ?>">
         <a href="<?= $base ?>/contact/index.php"><i class="fa fa-exclamation-triangle"></i><span>Émettre une alerte</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('historiques', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'historiques') ?>">
         <a href="<?= $base ?>/historiques/index.php"><i class="fa fa-history"></i><span>Historiques</span></a>
       </li>
+      <?php endif; ?>
 
-      <li class="treeview <?= sidebarActive($current, 'fiche_bilan') ?>">
+      <?php if (afficherOnglet('bilan', $menusVisibles)): ?>
+      <li class="treeview <?= (strpos($current, 'fiche_bilan') !== false && basename($current) !== 'formulaire_bilan.php') ? 'active' : '' ?>">
         <a href="<?= $base ?>/fiche_bilan/index.php"><i class="fa fa-file-text-o"></i><span>Bilan</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('fiche_bilan_form', $menusVisibles)): ?>
+      <li class="treeview <?= (basename($current) === 'formulaire_bilan.php') ? 'active' : '' ?>">
+        <a href="<?= $base ?>/fiche_bilan/formulaire_bilan.php"><i class="fa fa-plus-circle"></i><span>Fiche bilan</span></a>
+      </li>
+      <?php endif; ?>
+
+      <?php if (afficherOnglet('documentation', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'documentation') ?>">
         <a href="<?= $base ?>/documentation/index.php"><i class="fa fa-book"></i><span>Galerie</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('ajout_contact', $menusVisibles)): ?>
       <li class="treeview <?= (strpos($current, 'ajout_contact') !== false && strpos($current, 'liste') === false) ? 'active' : '' ?>">
         <a href="<?= $base ?>/ajout_contact/index.php"><i class="fa fa-user-plus"></i><span>Enregistrer un contact</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('liste_contacts', $menusVisibles)): ?>
       <li class="treeview <?= (strpos($current, 'ajout_contact') !== false && strpos($current, 'liste') !== false) ? 'active' : '' ?>">
         <a href="<?= $base ?>/ajout_contact/liste.php"><i class="fa fa-address-book"></i><span>Liste des contacts</span></a>
       </li>
+      <?php endif; ?>
 
+      <?php if (afficherOnglet('utilisateurs', $menusVisibles)): ?>
       <li class="treeview <?= sidebarActive($current, 'utilisateurs') ?>">
         <a href="<?= $base ?>/utilisateurs/index.php"><i class="fa fa-user"></i><span>Gestion des utilisateurs</span></a>
       </li>
+      <?php endif; ?>
 
     </ul>
   </section>
