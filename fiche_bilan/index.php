@@ -13,13 +13,23 @@ try {
     die("Erreur de connexion à la base de données : " . htmlspecialchars($e->getMessage()));
 }
 
+// Suppression d'un bilan (bouton corbeille sur chaque carte)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    $stmt = $pdo->prepare("DELETE FROM bilans WHERE id_bilan = :id");
+    $stmt->execute([':id' => (int)$_POST['delete_id']]);
+    header('Location: index.php?deleted=1');
+    exit;
+}
+
 // Récupération de tous les bilans depuis la table `bilans` (du plus récent au plus ancien)
 $stmt = $pdo->query("SELECT * FROM bilans ORDER BY id_bilan DESC");
 $bilans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Paramètres d'URL transmis après l'enregistrement d'un nouveau bilan
+// Paramètres d'URL transmis après l'enregistrement/la suppression d'un bilan
 $estCree        = isset($_GET['created']) && $_GET['created'] === '1';
 $idSurbrillance = isset($_GET['highlight']) ? (int)$_GET['highlight'] : 0;
+$estSupprime    = isset($_GET['deleted']) && $_GET['deleted'] === '1';
+$estModifie     = isset($_GET['updated']) && $_GET['updated'] === '1';
 
 /**
  * Formate un tableau PostgreSQL TEXT[] (ex: {"Pluies","Caniveaux"}) en texte lisible
@@ -29,7 +39,7 @@ function formaterListePg(?string $pgArray): string {
         return 'Non renseigné';
     }
     $interieur = trim($pgArray, '{}');
-    $elements  = str_getcsv($interieur);
+    $elements  = str_getcsv($interieur, ',', '"', '\\');
     $nettoyes  = array_filter(array_map('trim', $elements), fn($v) => $v !== '');
     return !empty($nettoyes) ? implode(', ', $nettoyes) : 'Non renseigné';
 }
@@ -83,8 +93,11 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
         #fiche-bilan-page .badge-brouillon { background: #e2e8f0; color: #334155; }
         #fiche-bilan-page .ligne { margin: 6px 0; font-size: 0.95rem; }
         #fiche-bilan-page .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-        #fiche-bilan-page button { padding: 7px 14px; border-radius: 6px; border: 1px solid #0f4c81; background: #fff; color: #0f4c81; font-weight: 600; cursor: pointer; }
+        #fiche-bilan-page button, #fiche-bilan-page .actions a { padding: 7px 14px; border-radius: 6px; border: 1px solid #0f4c81; background: #fff; color: #0f4c81; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 0.92rem; }
         #fiche-bilan-page button.primaire { background: #0f4c81; color: #fff; }
+        #fiche-bilan-page .actions form { margin: 0; }
+        #fiche-bilan-page button.danger, #fiche-bilan-page .actions a.danger { border-color: #dc2626; color: #dc2626; }
+        #fiche-bilan-page .actions a.telecharger { border-color: #166534; color: #166534; }
         #fiche-bilan-page .details { display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1; font-size: 0.92rem; color: #334155; }
         #fiche-bilan-page .vide { background: #fff; padding: 24px; border-radius: 8px; text-align: center; color: #64748b; border: 1px solid #e2e8f0; }
         @media (max-width: 650px) { #fiche-bilan-page .kpis { grid-template-columns: 1fr; } }
@@ -125,6 +138,16 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
     <?php if ($estCree): ?>
         <div class="alert-success">
             Le bilan #BIL-<?= $idSurbrillance ?> a été enregistré et apparaît en tête de la liste ci-dessous.
+        </div>
+    <?php endif; ?>
+    <?php if ($estSupprime): ?>
+        <div class="alert-success">
+            Le bilan a été supprimé.
+        </div>
+    <?php endif; ?>
+    <?php if ($estModifie): ?>
+        <div class="alert-success">
+            Le bilan #BIL-<?= $idSurbrillance ?> a été modifié.
         </div>
     <?php endif; ?>
 
@@ -209,6 +232,13 @@ $totalHabitations = array_sum(array_map(fn($b) => (int)$b['nb_habitations_touche
                     <div class="actions">
                         <button type="button" class="primaire" onclick="toggleDetails(<?= $id ?>)">Détails</button>
                         <button type="button" onclick="voirSurCarte(<?= (float)$bilan['latitude'] ?>, <?= (float)$bilan['longitude'] ?>)">Voir sur la carte</button>
+                        <a href="modifier_bilan.php?id=<?= $id ?>" title="Modifier"><i class="fa fa-pencil"></i> Modifier</a>
+                        <form method="POST" onsubmit="return confirm('Supprimer définitivement ce bilan ?');">
+                            <input type="hidden" name="delete_id" value="<?= $id ?>">
+                            <button type="submit" class="danger" title="Supprimer"><i class="fa fa-trash"></i> Supprimer</button>
+                        </form>
+                        <a class="telecharger" href="export_bilan.php?id=<?= $id ?>&format=word" title="Télécharger en Word"><i class="fa fa-file-word-o"></i> Word</a>
+                        <a class="telecharger" href="export_bilan.php?id=<?= $id ?>&format=pdf" title="Télécharger en PDF"><i class="fa fa-file-pdf-o"></i> PDF</a>
                     </div>
 
                     <!-- DÉTAIL DÉPLIABLE DU BILAN -->
